@@ -150,45 +150,4 @@
                         <label class="flex items-center space-x-3 cursor-pointer hover:text-white"><input type="checkbox" x-model="filterSameCabin" class="rounded bg-slate-950 border-slate-700 text-sky-500 w-4 h-4" /><span>Same Cabin</span></label>
                         <label class="flex items-center space-x-3 cursor-pointer hover:text-white"><input type="checkbox" x-model="filterSameClass" class="rounded bg-slate-950 border-slate-700 text-sky-500 w-4 h-4" /><span>Same RBD</span></label>
                         <label class="flex items-center space-x-3 cursor-pointer hover:text-white"><input type="checkbox" x-model="filterOalAllowed" class="rounded bg-slate-950 border-slate-700 text-sky-500 w-4 h-4" /><span>OAL Allowed</span></label>
-                        <label class="flex items-center space-x-3 cursor-pointer hover:text-white"><input type="checkbox" x-model="filterRefundAllowed" class="rounded bg-slate-950 border-slate-700 text-sky-500 w-4 h-4" /><span>Refund Permitted</span></label>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl">
-                    <span class="text-xs font-semibold text-slate-400 block mb-3 uppercase tracking-wider">Airlines Index (<span x-text="filteredAirlines.length"></span>)</span>
-                    <div class="space-y-1.5 max-h-[300px] overflow-y-auto pr-1">
-                        <template x-for="airline in filteredAirlines" :key="airline.iata">
-                            <div class="group flex items-center space-x-1.5">
-                                <button @click="selectedAirline = airline" :class="selectedAirline && selectedAirline.iata === airline.iata ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-lg' : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800/60'" class="flex-1 text-left p-3 rounded-lg flex justify-between items-center transition">
-                                    <div class="flex items-center space-x-3"><span class="text-lg" x-text="airline.logo"></span><span class="font-semibold text-sm" x-text="airline.airlineName"></span></div>
-                                    <span class="font-mono text-xs opacity-70" x-text="'[' + airline.iata + ']'"></span>
-                                </button>
-                                <template x-if="isAdminMode">
-                                    <div class="flex flex-col space-y-1">
-                                        <button @click="editAirline(airline)" class="p-1 bg-slate-800 hover:bg-amber-600 text-[10px] rounded text-amber-400 hover:text-white">✏️</button>
-                                        <button @click="deleteAirline(airline.iata)" class="p-1 bg-slate-800 hover:bg-rose-600 text-[10px] rounded text-rose-400 hover:text-white">❌</button>
-                                    </div>
-                                </template>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lg:col-span-3 space-y-6">
-                
-                <template x-if="isAdminMode">
-                    <div class="bg-slate-900 border-2 border-dashed border-amber-500/30 rounded-xl p-6 shadow-2xl space-y-6">
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                            <h3 class="font-bold text-base text-amber-400 uppercase tracking-wider" x-text="isEditing ? 'Modify Carrier Profiles Matrix' : 'Inject New Fleet Policy Ruleset' "></h3>
-                            <button @click="resetForm()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white px-3 py-1 rounded">Reset Form</button>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-                            <div><label class="block text-xs font-semibold text-slate-400 mb-1">Airline Name</label><input type="text" x-model="formAirline.airlineName" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white focus:outline-none" /></div>
-                            <div><label class="block text-xs font-semibold text-slate-400 mb-1">IATA Code</label><input type="text" x-model="formAirline.iata" :disabled="isEditing" placeholder="e.g. WS" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white disabled:opacity-50 focus:outline-none" /></div>
-                            <div><label class="block text-xs font-semibold text-slate-400 mb-1">ICAO Code</label><input type="text" x-model="formAirline.icao" placeholder="e.g. WJA" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white focus:outline-none" /></div>
-                            <div><label class="block text-xs font-semibold text-slate-400 mb-1">Logo Sign / Emoji</label><input type="text" x-model="formAirline.logo" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white text-center focus:outline-none" /></div>
-                        </div>
-
-                        <div class="border-t border-slate-800/80 pt
+                        <label class="flex items-center space-x-3 cursor-pointer hover:text-white"><input type="checkbox" x-model="filterRefundAllowed" class="rounded bg-slate
