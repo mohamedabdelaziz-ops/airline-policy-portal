@@ -21,7 +21,6 @@
         isEditing: false,
         airlines: [],
         
-        // Admin Form Working State with extra custom fields
         formAirline: {
             airlineName: '', iata: '', icao: '', logo: '✈️', lastUpdated: '2026-06-26',
             scheduleChange: { minorChange: '', majorChange: '', threshold: '', travelWindow: '', sameCabin: false, sameBookingClass: false, lowestAvailableClass: '', oalAllowed: false, ticketReissue: false, waiverRequired: false, endorsementCode: '', geoAllowance: '' },
@@ -32,12 +31,12 @@
             this.airlines = [
                 {
                     airlineName: 'Air Canada', iata: 'AC', icao: 'ACA', logo: '✈️', lastUpdated: '2026-06-26',
-                    scheduleChange: { minorChange: 'Less than 60 minutes', majorChange: '60 minutes or more', threshold: '60 minutes', travelWindow: '+/-7 days', sameCabin: true, sameBookingClass: true, lowestAvailableClass: 'Same RBD Preferred', oalAllowed: false, ticketReissue: true, waiverRequired: true, endorsementCode: 'ACSKCHG', geoAllowance: 'Involuntary Reroute Rules' },
+                    scheduleChange: { minorChange: 'Less than 60 minutes', majorChange: '60 minutes or more', threshold: '60 minutes', travelWindow: '+/-7 days', sameCabin: true, sameBookingClass: true, lowestAvailableClass: 'Same RBD Preferred', oalAllowed: false, ticketReissue: true, waiverRequired: true, endorsementCode: 'ACSKCHG', geoAllowance: 'Involuntary Reroute Rules Only' },
                     refundPolicy: { refundAllowed: true, refundThreshold: '120 minutes', cancellationRefund: true, majorScheduleChangeRefund: true, penalty: 'None', waiverRequired: true, refundWaiverCode: 'ACREFUNDS' }
                 },
                 {
                     airlineName: 'Delta Air Lines', iata: 'DL', icao: 'DAL', logo: '📐', lastUpdated: '2026-06-20',
-                    scheduleChange: { minorChange: 'Less than 60 minutes', majorChange: '60 minutes or more', threshold: '60 minutes', travelWindow: '+/-2 days', sameCabin: true, sameBookingClass: true, lowestAvailableClass: 'Main Cabin Lowest', oalAllowed: true, ticketReissue: true, waiverRequired: false, endorsementCode: 'SKCHG DL', geoAllowance: 'Co-terminal options' },
+                    scheduleChange: { minorChange: 'Less than 60 minutes', majorChange: '60 minutes or more', threshold: '60 minutes', travelWindow: '+/-2 days', sameCabin: true, sameBookingClass: true, lowestAvailableClass: 'Main Cabin Lowest', oalAllowed: true, ticketReissue: true, waiverRequired: false, endorsementCode: 'SKCHG DL', geoAllowance: 'Co-terminal options permitted' },
                     refundPolicy: { refundAllowed: true, refundThreshold: '180 minutes', cancellationRefund: true, majorScheduleChangeRefund: true, penalty: 'None', waiverRequired: false, refundWaiverCode: 'DL INVOL REF' }
                 },
                 {
@@ -192,75 +191,4 @@
                             <div><label class="block text-xs font-semibold text-slate-400 mb-1">Logo Sign / Emoji</label><input type="text" x-model="formAirline.logo" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white text-center focus:outline-none" /></div>
                         </div>
 
-                        <div class="border-t border-slate-800/80 pt-4 space-y-4">
-                            <h4 class="text-xs font-bold text-sky-400 uppercase tracking-widest">Disruption Configs</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                                <div><label class="block text-xs font-semibold text-slate-400 mb-1">Minor Change Definition</label><input type="text" x-model="formAirline.scheduleChange.minorChange" placeholder="e.g. <181 min" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white" /></div>
-                                <div><label class="block text-xs font-semibold text-slate-400 mb-1">Major Change Definition</label><input type="text" x-model="formAirline.scheduleChange.majorChange" placeholder="e.g. 181 min or more" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white" /></div>
-                                <div><label class="block text-xs font-semibold text-slate-400 mb-1">Threshold Primary Trigger</label><input type="text" x-model="formAirline.scheduleChange.threshold" placeholder="e.g. 181 minutes" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white" /></div>
-                                <div><label class="block text-xs font-semibold text-slate-400 mb-1">Allowed Window (+/- days)</label><input type="text" x-model="formAirline.scheduleChange.travelWindow" placeholder="e.g. +/-2 days" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white" /></div>
-                                <div><label class="block text-xs font-semibold text-slate-400 mb-1">Inventory Fallback Target</label><input type="text" x-model="formAirline.scheduleChange.lowestAvailableClass" placeholder="e.g. Next highest up to Y" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white" /></div>
-                                
-                                <div><label class="block text-xs font-semibold text-slate-400 mb-1">Endorsement Waiver Box Text</label><input type="text" x-model="formAirline.scheduleChange.endorsementCode" placeholder="e.g. SKCHG" class="w-full bg-slate-950 border border-amber-500/40 p-2 rounded text-amber-300 focus:outline-none" /></div>
-                                <div><label class="block text-xs font-semibold text-slate-400 mb-1">Geo Airport Allowance Map</label><input type="text" x-model="formAirline.scheduleChange.geoAllowance" placeholder="e.g. Within 320 km" class="w-full bg-slate-950 border border-amber-500/40 p-2 rounded text-amber-300 focus:outline-none" /></div>
-                            </div>
-                            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs font-medium text-slate-300 pt-1">
-                                <label class="flex items-center space-x-2"><input type="checkbox" x-model="formAirline.scheduleChange.sameCabin" class="rounded bg-slate-950 text-sky-500" /><span>Same Cabin Req</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" x-model="formAirline.scheduleChange.sameBookingClass" class="rounded bg-slate-950 text-sky-500" /><span>Same RBD Req</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" x-model="formAirline.scheduleChange.oalAllowed" class="rounded bg-slate-950 text-sky-500" /><span>OAL Allowed</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" x-model="formAirline.scheduleChange.ticketReissue" class="rounded bg-slate-950 text-sky-500" /><span>Reissue Required</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" x-model="formAirline.scheduleChange.waiverRequired" class="rounded bg-slate-950 text-sky-500" /><span>Waiver Code Req</span></label>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-slate-800/80 pt-4 space-y-4">
-                            <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-widest">Refund Parameters</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                                <div><label class="block text-xs font-semibold text-slate-400 mb-1">Significant Refund Threshold</label><input type="text" x-model="formAirline.refundPolicy.refundThreshold" placeholder="e.g. 181 minutes" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white" /></div>
-                                <div><label class="block text-xs font-semibold text-slate-400 mb-1">Involuntary Admin Fee / Penalties</label><input type="text" x-model="formAirline.refundPolicy.penalty" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white" /></div>
-                                
-                                <div><label class="block text-xs font-semibold text-slate-400 mb-1">GDS Cash Refund Waiver Code</label><input type="text" x-model="formAirline.refundPolicy.refundWaiverCode" placeholder="e.g. Q21SKDRF22" class="w-full bg-slate-950 border border-emerald-500/40 p-2 rounded text-emerald-300 focus:outline-none" /></div>
-                            </div>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-medium text-slate-300 pt-1">
-                                <label class="flex items-center space-x-2"><input type="checkbox" x-model="formAirline.refundPolicy.refundAllowed" class="rounded bg-slate-950 text-emerald-500" /><span>Refund Allowed</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" x-model="formAirline.refundPolicy.cancellationRefund" class="rounded bg-slate-950 text-emerald-500" /><span>Cancellation Safe</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" x-model="formAirline.refundPolicy.majorScheduleChangeRefund" class="rounded bg-slate-950 text-emerald-500" /><span>SKD CHG Protected</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" x-model="formAirline.refundPolicy.waiverRequired" class="rounded bg-slate-950 text-emerald-500" /><span>Waiver Code Req</span></label>
-                            </div>
-                        </div>
-
-                        <button @click="saveAirline()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-bold uppercase text-xs tracking-wider rounded-lg shadow-lg hover:from-amber-400 hover:to-orange-500 transition">Save Policy Data Object</button>
-                    </div>
-                </template>
-
-                <div>
-                    <template x-if="selectedAirline">
-                        <div class="space-y-6">
-                            <div class="bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 p-6 rounded-xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xl">
-                                <div class="flex items-center space-x-4">
-                                    <div class="text-4xl bg-slate-950 p-3 rounded-xl border border-slate-700 shadow-inner" x-text="selectedAirline.logo"></div>
-                                    <div>
-                                        <h2 class="text-2xl font-bold text-white tracking-tight" x-text="selectedAirline.airlineName"></h2>
-                                        <p class="text-xs text-slate-400 mt-0.5">GDS Fleet Identification Codes: IATA: <span class="text-sky-400 font-mono font-bold" x-text="selectedAirline.iata"></span> | ICAO: <span class="text-sky-400 font-mono font-bold" x-text="selectedAirline.icao"></span></p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-[10px] uppercase font-bold tracking-widest text-slate-500 block">Database Profile Valid</span>
-                                    <span class="text-sm font-mono text-indigo-300 font-medium" x-text="selectedAirline.lastUpdated"></span>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 text-center"><span class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">SKD CHG Trigger</span><span class="text-base font-bold text-amber-400 mt-1 block" x-text="selectedAirline.scheduleChange.threshold || 'N/A'"></span></div>
-                                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 text-center"><span class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Travel Window</span><span class="text-base font-bold text-sky-400 mt-1 block" x-text="selectedAirline.scheduleChange.travelWindow || 'N/A'"></span></div>
-                                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 text-center"><span class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">OAL Rebooking</span><span :class="selectedAirline.scheduleChange.oalAllowed ? 'text-emerald-400' : 'text-rose-400'" class="text-base font-bold mt-1 block" x-text="selectedAirline.scheduleChange.oalAllowed ? 'ALLOWED' : 'PROHIBITED'"></span></div>
-                                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 text-center"><span class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Refund Eligibility</span><span :class="selectedAirline.refundPolicy.refundAllowed ? 'text-emerald-400' : 'text-rose-400'" class="text-base font-bold mt-1 block" x-text="selectedAirline.refundPolicy.refundAllowed ? 'YES' : 'NO'"></span></div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-xl space-y-4">
-                                    <div class="flex items-center space-x-2 border-b border-slate-800 pb-3">
-                                        <span class="text-lg">🔄</span><h3 class="text-sm font-bold text-sky-400 uppercase tracking-wider">Schedule Change Framework</h3>
-                                    </div>
-                                    <div class="space-y-3 text-sm">
-                                        <div class="flex justify-between border-b border-slate
+                        <div class="border-t border-slate-800/80 pt
