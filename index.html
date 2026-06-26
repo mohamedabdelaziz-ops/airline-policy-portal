@@ -24,7 +24,7 @@
         formAirline: {
             airlineName: '', iata: '', icao: '', logo: '✈️', lastUpdated: '2026-06-26',
             scheduleChange: { minorChange: '', majorChange: '', threshold: '', travelWindow: '', sameCabin: false, sameBookingClass: false, lowestAvailableClass: '', oalAllowed: false, ticketReissue: false, waiverRequired: false, endorsementCode: '', geoAllowance: '' },
-            refundPolicy: { refundAllowed: false, refundThreshold: '', cancellationRefund: false, majorScheduleChangeRefund: false, penalty: 'None', waiverRequired: false, refundWaiverCode: '', osiTourCode: '' }
+            refundPolicy: { refundAllowed: false, refundThreshold: '', cancellationRefund: false, majorScheduleChangeRefund: false, penalty: 'None', waiverRequired: false, refundWaiverCode: '' }
         },
 
         init() {
@@ -32,17 +32,17 @@
                 {
                     airlineName: 'Air Canada', iata: 'AC', icao: 'ACA', logo: '✈️', lastUpdated: '2026-06-26',
                     scheduleChange: { minorChange: 'Less than 60 minutes', majorChange: '60 minutes or more', threshold: '60 minutes', travelWindow: '+/-7 days', sameCabin: true, sameBookingClass: true, lowestAvailableClass: 'Same RBD Preferred', oalAllowed: false, ticketReissue: true, waiverRequired: true, endorsementCode: 'ACSKCHG', geoAllowance: 'Involuntary Reroute Rules Only' },
-                    refundPolicy: { refundAllowed: true, refundThreshold: '120 minutes', cancellationRefund: true, majorScheduleChangeRefund: true, penalty: 'None', waiverRequired: true, refundWaiverCode: 'ACREFUNDS', osiTourCode: 'OS AC INVOL SKCHG' }
+                    refundPolicy: { refundAllowed: true, refundThreshold: '120 minutes', cancellationRefund: true, majorScheduleChangeRefund: true, penalty: 'None', waiverRequired: true, refundWaiverCode: 'ACREFUNDS' }
                 },
                 {
                     airlineName: 'Delta Air Lines', iata: 'DL', icao: 'DAL', logo: '📐', lastUpdated: '2026-06-20',
                     scheduleChange: { minorChange: 'Less than 60 minutes', majorChange: '60 minutes or more', threshold: '60 minutes', travelWindow: '+/-2 days', sameCabin: true, sameBookingClass: true, lowestAvailableClass: 'Main Cabin Lowest', oalAllowed: true, ticketReissue: true, waiverRequired: false, endorsementCode: 'SKCHG DL', geoAllowance: 'Co-terminal options permitted' },
-                    refundPolicy: { refundAllowed: true, refundThreshold: '180 minutes', cancellationRefund: true, majorScheduleChangeRefund: true, penalty: 'None', waiverRequired: false, refundWaiverCode: 'DL INVOL REF', osiTourCode: 'OS DL SKCHG' }
+                    refundPolicy: { refundAllowed: true, refundThreshold: '180 minutes', cancellationRefund: true, majorScheduleChangeRefund: true, penalty: 'None', waiverRequired: false, refundWaiverCode: 'DL INVOL REF' }
                 },
                 {
                     airlineName: 'WestJet Airlines', iata: 'WS', icao: 'WJA', logo: '🍁', lastUpdated: '2026-06-26',
                     scheduleChange: { minorChange: 'Less than 181 minutes', majorChange: '181 minutes or more (3+ Hours)', threshold: '181 minutes', travelWindow: '+/-2 days', sameCabin: true, sameBookingClass: false, lowestAvailableClass: 'Next highest up to Y (Eco) / W (Prem) / J (Biz)', oalAllowed: true, ticketReissue: true, waiverRequired: true, endorsementCode: 'SKCHG', geoAllowance: 'Within 320 km / 200 miles (e.g. YVR/YXX)' },
-                    refundPolicy: { refundAllowed: true, refundThreshold: '181 minutes', cancellationRefund: true, majorScheduleChangeRefund: true, penalty: 'Taxes L8/DO non-refundable for PUJ/POP/AZS/LRM', waiverRequired: true, refundWaiverCode: 'Q21SKDRF22', osiTourCode: 'None Specified' }
+                    refundPolicy: { refundAllowed: true, refundThreshold: '181 minutes', cancellationRefund: true, majorScheduleChangeRefund: true, penalty: 'Taxes L8/DO non-refundable for PUJ/POP/AZS/LRM', waiverRequired: true, refundWaiverCode: 'Q21SKDRF22' }
                 }
             ];
             this.selectedAirline = this.airlines[0];
@@ -65,7 +65,7 @@
             this.formAirline = {
                 airlineName: '', iata: '', icao: '', logo: '✈️', lastUpdated: '2026-06-26',
                 scheduleChange: { minorChange: '', majorChange: '', threshold: '', travelWindow: '', sameCabin: false, sameBookingClass: false, lowestAvailableClass: '', oalAllowed: false, ticketReissue: false, waiverRequired: false, endorsementCode: '', geoAllowance: '' },
-                refundPolicy: { refundAllowed: false, refundThreshold: '', cancellationRefund: false, majorScheduleChangeRefund: false, penalty: 'None', waiverRequired: false, refundWaiverCode: '', osiTourCode: '' }
+                refundPolicy: { refundAllowed: false, refundThreshold: '', cancellationRefund: false, majorScheduleChangeRefund: false, penalty: 'None', waiverRequired: false, refundWaiverCode: '' }
             };
             this.isEditing = false;
         },
@@ -106,42 +106,4 @@
             
             <div class="flex items-center space-x-4">
                 <div x-show="!isAdminMode" class="flex items-center space-x-2 bg-slate-900 p-1 border border-slate-800 rounded-lg">
-                    <input type="password" placeholder="Admin Key..." x-model="adminPasswordInput" @keyup.enter="verifyAdmin()" class="bg-slate-950 border-0 outline-none text-xs px-3 py-1.5 rounded text-white w-28 placeholder-slate-600 focus:ring-1 focus:ring-sky-500" />
-                    <button @click="verifyAdmin()" class="bg-slate-800 hover:bg-sky-600 text-white font-bold text-[10px] px-3 py-1.5 rounded transition uppercase tracking-wider">Auth</button>
-                </div>
-                <div x-show="isAdminMode" class="flex items-center space-x-2">
-                    <span class="text-xs font-mono px-2 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold">🛠️ ADMIN MASTER</span>
-                    <button @click="isAdminMode = false; resetForm()" class="text-xs border border-slate-700 bg-slate-800 hover:bg-rose-600 text-white px-3 py-1 rounded transition">Lock</button>
-                </div>
-            </div>
-        </nav>
-
-        <main class="max-w-7xl mx-auto p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-4 gap-8 flex-1 w-full">
-            
-            <div class="lg:col-span-1 space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Search Fleet Index</label>
-                        <input type="text" placeholder="Carrier, IATA, ICAO..." x-model="searchQuery" class="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 transition text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
-                    </div>
-                    
-                    <div class="space-y-2 pt-2 border-t border-slate-800 text-sm text-slate-300">
-                        <label class="flex items-center space-x-3 cursor-pointer hover:text-white"><input type="checkbox" x-model="filterSameCabin" class="rounded bg-slate-950 border-slate-700 text-sky-500 w-4 h-4" /><span>Same Cabin</span></label>
-                        <label class="flex items-center space-x-3 cursor-pointer hover:text-white"><input type="checkbox" x-model="filterSameClass" class="rounded bg-slate-950 border-slate-700 text-sky-500 w-4 h-4" /><span>Same RBD</span></label>
-                        <label class="flex items-center space-x-3 cursor-pointer hover:text-white"><input type="checkbox" x-model="filterOalAllowed" class="rounded bg-slate-950 border-slate-700 text-sky-500 w-4 h-4" /><span>OAL Allowed</span></label>
-                        <label class="flex items-center space-x-3 cursor-pointer hover:text-white"><input type="checkbox" x-model="filterRefundAllowed" class="rounded bg-slate-950 border-slate-700 text-sky-500 w-4 h-4" /><span>Refund Permitted</span></label>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl">
-                    <span class="text-xs font-semibold text-slate-400 block mb-3 uppercase tracking-wider">Airlines Index (<span x-text="filteredAirlines.length"></span>)</span>
-                    <div class="space-y-1.5 max-h-[300px] overflow-y-auto pr-1">
-                        <template x-for="airline in filteredAirlines" :key="airline.iata">
-                            <div class="group flex items-center space-x-1.5">
-                                <button @click="selectedAirline = airline" :class="selectedAirline && selectedAirline.iata === airline.iata ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-lg' : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800/60'" class="flex-1 text-left p-3 rounded-lg flex justify-between items-center transition">
-                                    <div class="flex items-center space-x-3"><span class="text-lg" x-text="airline.logo"></span><span class="font-semibold text-sm" x-text="airline.airlineName"></span></div>
-                                    <span class="font-mono text-xs opacity-70" x-text="'[' + airline.iata + ']'"></span>
-                                </button>
-                                <template x-if="isAdminMode">
-                                    <div class="flex flex-col space-y-1">
-                                        <button @click="editAirline(airline)" class="p-1 bg-slate-800 hover:bg-amber-600
+                    <input type="password" placeholder="Admin Key..." x-model="adminPasswordInput" @keyup.enter="verifyAdmin()" class="
