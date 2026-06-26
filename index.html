@@ -244,6 +244,20 @@
                                         <div class="flex justify-between border-b border-slate-800/40 pb-1.5"><span class="text-slate-400">Inventory Fallback Target</span><span class="font-medium text-indigo-300 font-mono text-xs bg-slate-950 px-2 py-0.5 rounded border border-slate-800" x-text="selectedAirline.scheduleChange.lowestAvailableClass || 'N/A'"></span></div>
                                         <div class="flex justify-between border-b border-slate-800/40 pb-1.5"><span class="text-slate-400">Ticket Reissue Required</span><span :class="selectedAirline.scheduleChange.ticketReissue ? 'text-amber-400' : 'text-slate-400'" class="font-semibold" x-text="selectedAirline.scheduleChange.ticketReissue ? 'YES - Reissue Needed' : 'NO - Authority Waiver Only'"></span></div>
                                         <div class="flex justify-between pb-0.5"><span class="text-slate-400">GDS Endorsement Waiver</span><span :class="selectedAirline.scheduleChange.waiverRequired ? 'text-amber-400' : 'text-emerald-400'" class="font-semibold" x-text="selectedAirline.scheduleChange.waiverRequired ? 'Mandatory Waiver Code' : 'Automated Verification Code'"></span></div>
+                                   <div class="flex justify-between border-b border-slate-800/40 pb-1.5"><span class="text-slate-400">GDS Endorsement Waiver</span><span :class="selectedAirline.scheduleChange.waiverRequired ? 'text-amber-400' : 'text-emerald-400'" class="font-semibold" x-text="selectedAirline.scheduleChange.waiverRequired ? 'Mandatory Waiver Code' : 'Automated Verification Code'"></span></div>
+        
+        <div class="flex justify-between border-b border-slate-800/40 pb-1.5">
+            <span class="text-slate-400">Endorsement Box Waiver Text</span>
+            <span class="font-mono text-xs font-bold text-amber-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800" x-text="selectedAirline.scheduleChange.endorsementCode || 'N/A'"></span>
+        </div>
+        <div class="flex justify-between pb-0.5">
+            <span class="text-slate-400">Geo Airport Allowance Map</span>
+            <span class="font-medium text-slate-200" x-text="selectedAirline.scheduleChange.geoAllowance || 'N/A'"></span>
+        </div>
+
+    </div> </div> ```
+
+Go ahead and paste those sections into your editor file right under the Endorsement row, hit commit changes at the bottom, and your dashboard rows will be perfectly updated!
                                     </div>
                                 </div>
 
