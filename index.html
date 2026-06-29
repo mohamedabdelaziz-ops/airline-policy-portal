@@ -19,10 +19,6 @@
         currentLang: 'en',
         activePolicy: 'pure_skchg', 
         airlines: [],
-        
-        newCustomLabel: '',
-        newCustomValue: '',
-        newCustomStatus: true,
 
         i18n: {
             en: {
@@ -94,40 +90,111 @@
         init() {
             this.airlines = [
                 {
-                    airlineName: 'Lufthansa Group', iata: 'LH', icao: 'DLH', logo: '🇩🇪', lastUpdated: '2026-06-29',
-                    policyWebLink: 'https://www.lufthansagroup.com/en/themes/agency-support.html', policyPdfLink: '',
-                    threshold: 'Varies by destination routing attributes', travelWindow: 'Subject to inventory reinstatement controls.', oalRebookingVal: 'PROHIBITED', refundEligVal: 'YES',
+                    airlineName: 'WestJet Airlines', iata: 'WS', icao: 'WJA', logo: '🍁', lastUpdated: '2026-06-26',
+                    policyWebLink: 'https://www.westjet.com/en-ca/travel-agents', policyPdfLink: '',
+                    threshold: '181 minutes', travelWindow: '+/-2 days original dates', oalRebookingVal: 'ALLOWED', refundEligVal: 'YES',
                     pureSkchg: {
                         fields: [
-                            { label: 'Minor Change Profile', value: 'Time deviations below airline-defined threshold limits.', allowed: true },
-                            { label: 'Major Change Profile', value: 'Significant operation adjustments or scheduling cancellations.', allowed: true },
-                            { label: 'Cabin Matching Rules', value: 'Strict Cabin Balance Required.', allowed: false },
-                            { label: 'Booking Class (RBD) Rules', value: 'Rebook original RBD class configuration if active.', allowed: true },
-                            { label: 'Inventory Fallback Target', value: 'Original booking class preferred.', allowed: true },
-                            { label: 'Endorsement Box Waiver Text', value: 'DUE SKCH', allowed: true },
-                            { label: 'Geo Airport Allowance Map', value: 'Bilateral alternate rerouting constraints apply.', allowed: false },
-                            { label: 'Involuntary Cancel Refund', value: 'Full Refund Authorized', allowed: true },
-                            { label: 'Significant Change Trigger', value: 'More than 3 hours deviation or cancel with no acceptable protection available.', allowed: true },
-                            { label: 'Involuntary Admin Penalties', value: 'None', allowed: true },
-                            { label: 'GDS Cash Refund Waiver Code', value: 'System Verified', allowed: true },
-                            { label: 'GDS OSI / Tour Code Box', value: 'OS LH INVOL SKCHG', allowed: true },
-                            { label: 'Policy if Main Airline Causes Change', value: 'Full complimentary reinstatement into original RBD on new PNR. If closed, rebook next open class inside original cabin.', allowed: true },
-                            { label: 'SKCHG Contact Email', value: 'agency.support@lufthansagroup.com', allowed: true },
-                            { label: 'SKCHG Contact Phone', value: '+49 69 86 799 799', allowed: true }
+                            { label: 'MINOR CHANGE PROFILE', value: 'Less than 181 minutes time gap layout change.', allowed: true },
+                            { label: 'MAJOR CHANGE PROFILE', value: '181 minutes or more (3+ Hours) time variation change.', allowed: true },
+                            { label: 'CABIN MATCHING RULES', value: 'Same Cabin Balance Required.', allowed: false },
+                            { label: 'BOOKING CLASS (RBD) RULES', value: 'Lowest Class Allowed Fallback inside cabin.', allowed: true },
+                            { label: 'INVENTORY FALLBACK TARGET', value: 'Next highest up to Y (Eco) / W (Prem) / J (Biz).', allowed: true },
+                            { label: 'ENDORSEMENT BOX WAIVER TEXT', value: 'SKCHG', allowed: true },
+                            { label: 'GEO AIRPORT ALLOWANCE MAP', value: 'Within 320 km / 200 miles (e.g. YVR/YXX)', allowed: true },
+                            { label: 'INVOLUNTARY CANCEL REFUND', value: 'Full Refund Authorized', allowed: true },
+                            { label: 'SIGNIFICANT CHANGE TRIGGER', value: '181 minutes', allowed: true },
+                            { label: 'INVOLUNTARY ADMIN PENALTIES', value: 'None for involuntary', allowed: true },
+                            { label: 'GDS CASH REFUND WAIVER CODE', value: 'Q21SKDRF22', allowed: true },
+                            { label: 'GDS OSI / TOUR CODE BOX', value: 'None Specified', allowed: true },
+                            { label: 'POLICY IF MAIN AIRLINE CAUSES CHANGE', value: 'Full automated reissue allowed on WestJet flights into identical cabins matching original routing loops.', allowed: true },
+                            { label: 'SKCHG CONTACT EMAIL', value: 'agencysalessupport@westjet.com', allowed: true },
+                            { label: 'SKCHG CONTACT PHONE', value: '+1 877 664 3205', allowed: true }
                         ]
                     },
                     pureName: {
                         fields: [
-                            { label: 'Self-Service Typo Tolerance Threshold', value: 'Up to two (2) letters in first/middle/last name or title (e.g. BRWON to BROWN) via reservation software.', allowed: true },
-                            { label: 'Nickname / Alternative Variant Mapping', value: 'Nicknames (e.g. BILL to WILLIAM, USCHI to URSULA) must go via LHG support.', allowed: false },
-                            { label: 'Inverted Given/Surname Sequence Rules', value: 'Inverted names (PETER/WILLIAM to WILLIAM/PETER) managed by Agency Support desks.', allowed: false },
-                            { label: 'Adding Second First/Middle/Last Names', value: 'Adding names as per passport allowed via Agency Support. Deletions prohibited.', allowed: false },
-                            { label: 'Legal / Marriage Changes', value: 'Passenger name changed due to marriage/divorce with certificates verification.', allowed: true },
-                            { label: 'Change Penalties / Fees', value: 'Abolished as of 01 July 2024. Processed free of charge.', allowed: true },
-                            { label: 'Reissue / Swap Command', value: 'Ticket must be reissued with text box indicator NAME CORRECTION.', allowed: true },
-                            { label: 'OSI Formatting String', value: 'Endorsement Box Waiver stamp: NAME CORRECTION.', allowed: true },
-                            { label: 'Technical Infrastructure Restrictions', value: 'WK operated flights require a separate new PNR layout split. Delete FQTV element if blocked.', allowed: false },
-                            { label: 'Non-Feasible Secondary Workarounds', value: 'Enter correct passport structure into SSR DOCS format string lines.', allowed: true },
+                            { label: 'Self-Service Typo Tolerance Threshold', value: 'First or middle name up to 3 chars.', allowed: true },
+                            { label: 'Legal / Marriage Changes', value: 'Marriage/Divorce certificates accepted.', allowed: true },
+                            { label: 'Change Penalties / Fees', value: 'UltraBasic excluded, others free for typos.', allowed: true },
+                            { label: 'Reissue / Swap Command', value: 'CHNE/GDS PRIME SWAP', allowed: true },
+                            { label: 'OSI Formatting String', value: 'OS WS TYPO CORR', allowed: true },
+                            { label: 'Nickname / Alternative Variant Mapping', value: 'Subject to standard name modification thresholds', allowed: true },
+                            { label: 'Inverted Given/Surname Sequence Rules', value: 'Re-sync parameters available', allowed: true },
+                            { label: 'Adding Second First/Middle/Last Names', value: 'Appended upon strict manifest matching criteria', allowed: true },
+                            { label: 'Technical Infrastructure Restrictions', value: 'FQTV lines must be dropped beforehand', allowed: false },
+                            { label: 'Non-Feasible Secondary Workarounds', value: 'SSR elements insertion workaround entries', allowed: true },
+                            { label: 'Name Contact Email', value: 'trade.support@westjet.com', allowed: true },
+                            { label: 'Name Contact Phone', value: '+1 888 937 8538', allowed: true }
+                        ]
+                    },
+                    oalSkchg: {
+                        fields: [
+                            { label: 'Minor Change Profile', value: 'OAL minor loops follow commercial interline partner bilateral code rules.', allowed: true },
+                            { label: 'Major Change Profile', value: 'Partner disruption changes require active reprotection on codeshare nodes.', allowed: true },
+                            { label: 'Cabin Matching Rules', value: 'Cabin tier matching mandatory.', allowed: false },
+                            { label: 'Booking Class (RBD) Rules', value: 'Lowest class open in partner cabin tier.', allowed: true },
+                            { label: 'Inventory Fallback Target', value: 'Next highest inventory mapping code rules.', allowed: true },
+                            { label: 'Endorsement Box Waiver Text', value: 'SKCHG OAL CODESHARE', allowed: true },
+                            { label: 'Geo Airport Allowance Map', value: 'Partner interline route mappings active.', allowed: true },
+                            { label: 'Rebooking Order Priority', value: '1. WestJet Prime -> 2. Commercial partner network agreements.', allowed: true },
+                            { label: 'Alliance Rebooking Allowance', value: 'Non-alliance point-to-point interline rules apply as designated by commercial bilateral code books.', allowed: true },
+                            { label: 'Codeshare / Interline Mapping', value: 'Pure operating code lines prioritized over complex multi-segment codeshare sectors.', allowed: true },
+                            { label: 'Significant Change Trigger', value: '181+ minutes connector dropped', allowed: true },
+                            { label: 'Involuntary Admin Penalties', value: 'Taxes L8/DO non-refundable for PUJ/POP/AZS/LRM', allowed: true },
+                            { label: 'GDS Cash Refund Waiver Code', value: 'Q21SKDRF22 OAL', allowed: true },
+                            { label: 'GDS OSI / Tour Code Box', value: 'OSI WS INVOL SKCHG WITH CODESHARE PARTNER', allowed: true },
+                            { label: 'Policy if Codeshare/OAL Partner Causes Change', value: 'Rebooking on non-alliance commercial partner flights applies only if prime options are dropped entirely.', allowed: false },
+                            { label: 'Refund Policy if Codeshare/OAL Partner Causes Change', value: 'Permitted if partner flight drops affect connecting flights and exceed 181+ minutes.', allowed: true },
+                            { label: 'OAL Support Email', value: 'agencysalessupport@westjet.com', allowed: true },
+                            { label: 'OAL Support Phone', value: '+1 877 664 3205', allowed: true }
+                        ]
+                    },
+                    oalName: {
+                        fields: [
+                            { label: 'Name Correction Rules with Codeshare/OAL Flights', value: 'Bilateral commercial rules state that OAL partner segments must be cleared before agents manually force name updates over GDS PNR fields.', allowed: false },
+                            { label: 'Technical Sync Restrictions', value: 'Split functions must execute prior to modifying profile nodes.', allowed: false },
+                            { label: 'Non-Feasible Secondary Workarounds', value: 'Direct connection support line intervention.', allowed: true },
+                            { label: 'OAL Name Email', value: 'trade.support@westjet.com', allowed: true },
+                            { label: 'OAL Name Phone', value: '+1 888 937 8538', allowed: true }
+                        ]
+                    }
+                },
+                {
+                    airlineName: 'Lufthansa Group', iata: 'LH', icao: 'DLH', logo: '🇩🇪', lastUpdated: '2026-06-29',
+                    policyWebLink: 'https://www.lufthansagroup.com/en/themes/agency-support.html', policyPdfLink: '',
+                    threshold: 'Varies by destination routing attributes', travelWindow: 'Subject to inventory controls.', oalRebookingVal: 'PROHIBITED', refundEligVal: 'YES',
+                    pureSkchg: {
+                        fields: [
+                            { label: 'MINOR CHANGE PROFILE', value: 'Time deviations below airline-defined threshold limits.', allowed: true },
+                            { label: 'MAJOR CHANGE PROFILE', value: 'Significant operation adjustments or scheduling cancellations.', allowed: true },
+                            { label: 'CABIN MATCHING RULES', value: 'Strict Cabin Balance Required.', allowed: false },
+                            { label: 'BOOKING CLASS (RBD) RULES', value: 'Rebook original RBD class configuration if active.', allowed: true },
+                            { label: 'INVENTORY FALLBACK TARGET', value: 'Original booking class preferred.', allowed: true },
+                            { label: 'ENDORSEMENT BOX WAIVER TEXT', value: 'DUE SKCH', allowed: true },
+                            { label: 'GEO AIRPORT ALLOWANCE MAP', value: 'Bilateral alternate rerouting constraints apply.', allowed: false },
+                            { label: 'INVOLUNTARY CANCEL REFUND', value: 'Full Refund Authorized', allowed: true },
+                            { label: 'SIGNIFICANT CHANGE TRIGGER', value: 'More than 3 hours deviation or cancel with no acceptable protection available.', allowed: true },
+                            { label: 'INVOLUNTARY ADMIN PENALTIES', value: 'None', allowed: true },
+                            { label: 'GDS CASH REFUND WAIVER CODE', value: 'System Verified', allowed: true },
+                            { label: 'GDS OSI / TOUR CODE BOX', value: 'OS LH INVOL SKCHG', allowed: true },
+                            { label: 'POLICY IF MAIN AIRLINE CAUSES CHANGE', value: 'Full complimentary reinstatement into original RBD on new PNR. If closed, rebook next open class inside original cabin.', allowed: true },
+                            { label: 'SKCHG CONTACT EMAIL', value: 'agency.support@lufthansagroup.com', allowed: true },
+                            { label: 'SKCHG CONTACT PHONE', value: '+49 69 86 799 799', allowed: true }
+                        ]
+                    },
+                    pureName: {
+                        fields: [
+                            { label: 'Self-Service Typo Tolerance Threshold', value: 'Up to two (2) letters in first/middle/last name or title (e.g. BRWON to BROWN) via GDS.', allowed: true },
+                            { label: 'Nickname / Alternative Variant Mapping', value: 'Correction of common variants (e.g., BILL to WILLIAM) must be routed to Lufthansa Group.', allowed: false },
+                            { label: 'Inverted Given/Surname Sequence Rules', value: 'Correction of names in an inverted sequence (e.g., PETER/WILLIAM to WILLIAM/PETER) must be handled by Lufthansa Group Agency Support.', allowed: false },
+                            { label: 'Adding Second First/Middle/Last Names', value: 'Adding a first, middle, or last name as per travel document (proof required) is managed by Lufthansa Group Agency Support.', allowed: false },
+                            { label: 'Legal / Marriage Changes', value: 'Passenger name changes due to marriage, divorce, gender reassignment, legal proceedings and/or a new passport/ID are allowed with valid proof.', allowed: true },
+                            { label: 'Change Penalties / Fees', value: 'As of 01 July 2024, the Name Correction Fee has been completely abolished.', allowed: true },
+                            { label: 'Reissue / Swap Command', value: 'Native ticket reissue as even exchange. No waiver from support is needed.', allowed: true },
+                            { label: 'OSI Formatting String', value: 'Endorsement Box text must be documented with: NAME CORRECTION.', allowed: true },
+                            { label: 'Technical Infrastructure Restrictions', value: 'If an FQTV element is included, delete it and re-enter after correction.', allowed: false },
+                            { label: 'Non-Feasible Secondary Workarounds', value: 'If name correction in the ticket is not feasible, enter correct name as SSR DOCS element.', allowed: true },
                             { label: 'Name Contact Email', value: 'lhg.fulfillment@lufthansagroup.com', allowed: true },
                             { label: 'Name Contact Phone', value: '+49 69 86 799 800', allowed: true }
                         ]
@@ -141,7 +208,7 @@
                             { label: 'Alliance Rebooking Allowance', value: 'Star Alliance carriers fully authorized inside identical cabin maps.', allowed: true },
                             { label: 'Codeshare / Interline Mapping', value: 'Rebook on operating prime flight if marketing codeshare code drops.', allowed: true },
                             { label: 'Policy if Codeshare/OAL Partner Causes Change', value: 'Lufthansa Group support cannot assist with flight confirmations on other airlines. Fare differences apply if confirmed in higher GDS class.', allowed: false },
-                            { label: 'Refund Policy if Codeshare/OAL Partner Causes Change', value: 'Authorized if the partner airline changes cause a structural misconnect or delay over 3 hours. Ticket stock 257/082/220/724 must be verified.', allowed: true },
+                            { label: 'Refund Policy if Codeshare/OAL Partner Causes Change', value: 'Authorized if the partner airline changes cause a structural misconnect or delay over 3 hours.', allowed: true },
                             { label: 'OAL Support Email', value: 'oal.support@lufthansagroup.com', allowed: true },
                             { label: 'OAL Support Phone', value: '+49 69 86 799 900', allowed: true }
                         ]
@@ -157,26 +224,26 @@
                     }
                 },
                 {
-                    airlineName: 'Air Canada', iata: 'AC', icao: 'ACA', logo: '🍁', lastUpdated: '2026-06-27',
+                    airlineName: 'Air Canada', iata: 'AC', icao: 'ACA', logo: '🇨🇦', lastUpdated: '2026-06-27',
                     policyWebLink: 'https://www.aircanada.com/agency', policyPdfLink: '',
                     threshold: '60 minutes', travelWindow: '+/-7 days (Sun/Intl market up to +/-30 days)', oalRebookingVal: 'ALLOWED', refundEligVal: 'YES',
                     pureSkchg: {
                         fields: [
-                            { label: 'Minor Change Profile', value: 'Less than 60 minutes time deviation.', allowed: true },
-                            { label: 'Major Change Profile', value: '60 minutes or more / Operating carrier change / Stop added.', allowed: true },
-                            { label: 'Cabin Matching Rules', value: 'Strict Cabin Balance Required.', allowed: false },
-                            { label: 'Booking Class (RBD) Rules', value: 'Use original RBD. Fallback to lowest open code up to M class.', allowed: true },
-                            { label: 'Inventory Fallback Target', value: 'Original booking class preferred; up to Y class maximum fallback.', allowed: true },
-                            { label: 'Endorsement Box Waiver Text', value: 'DUE SKCH', allowed: true },
-                            { label: 'Geo Airport Allowance Map', value: 'Sister cities or alternate nodes within 200 miles radius permitted.', allowed: true },
-                            { label: 'Involuntary Cancel Refund', value: 'Full Refund Authorized', allowed: true },
-                            { label: 'Significant Change Trigger', value: 'More than 3 hours deviation', allowed: true },
-                            { label: 'Involuntary Admin Penalties', value: 'None', allowed: true },
-                            { label: 'GDS Cash Refund Waiver Code', value: 'ACUSKEDCHG + Flight Number', allowed: true },
-                            { label: 'GDS OSI / Tour Code Box', value: 'OS AC INVOL SKCHG', allowed: true },
-                            { label: 'Policy if Main Airline Causes Change', value: 'Full complimentary rebooking on AC mainline flights inside identical cabins matching original routing loops.', allowed: true },
-                            { label: 'SKCHG Contact Email', value: 'agency.support@aircanada.ca', allowed: true },
-                            { label: 'SKCHG Contact Phone', value: '+1 888 247 2262', allowed: true }
+                            { label: 'MINOR CHANGE PROFILE', value: 'Less than 60 minutes time deviation.', allowed: true },
+                            { label: 'MAJOR CHANGE PROFILE', value: '60 minutes or more / Operating carrier change / Stop added.', allowed: true },
+                            { label: 'CABIN MATCHING RULES', value: 'Strict Cabin Balance Required.', allowed: false },
+                            { label: 'BOOKING CLASS (RBD) RULES', value: 'Use original RBD. Fallback to lowest open code up to M class.', allowed: true },
+                            { label: 'INVENTORY FALLBACK TARGET', value: 'Original booking class preferred; up to Y class maximum fallback.', allowed: true },
+                            { label: 'ENDORSEMENT BOX WAIVER TEXT', value: 'DUE SKCH', allowed: true },
+                            { label: 'GEO AIRPORT ALLOWANCE MAP', value: 'Sister cities or alternate nodes within 200 miles radius permitted.', allowed: true },
+                            { label: 'INVOLUNTARY CANCEL REFUND', value: 'Full Refund Authorized', allowed: true },
+                            { label: 'SIGNIFICANT CHANGE TRIGGER', value: 'More than 3 hours deviation', allowed: true },
+                            { label: 'INVOLUNTARY ADMIN PENALTIES', value: 'None', allowed: true },
+                            { label: 'GDS CASH REFUND WAIVER CODE', value: 'ACUSKEDCHG + Flight Number', allowed: true },
+                            { label: 'GDS OSI / TOUR CODE BOX', value: 'OS AC INVOL SKCHG', allowed: true },
+                            { label: 'POLICY IF MAIN AIRLINE CAUSES CHANGE', value: 'Full complimentary rebooking on AC mainline flights inside identical cabins matching original routing loops.', allowed: true },
+                            { label: 'SKCHG CONTACT EMAIL', value: 'agency.support@aircanada.ca', allowed: true },
+                            { label: 'SKCHG CONTACT PHONE', value: '+1 888 247 2262', allowed: true }
                         ]
                     },
                     pureName: {
@@ -221,132 +288,7 @@
                             { label: 'Technical Sync Restrictions', value: 'OAL channels automatically drop connection blocks if names are modified directly on original records.', allowed: false },
                             { label: 'Non-Feasible Secondary Workarounds', value: 'Generate split profiles inside the native workstation system parameters.', allowed: true },
                             { label: 'OAL Name Email', value: 'trade.ca@aircanada.ca', allowed: true },
-                            { label: 'OAL Name Phone', value: '+1 888 247 2262', allowed: true }
-                        ]
-                    }
-                },
-                {
-                    airlineName: 'Delta Air Lines', iata: 'DL', icao: 'DAL', logo: '📐', lastUpdated: '2026-06-29',
-                    policyWebLink: 'https://pro.delta.com', policyPdfLink: '',
-                    threshold: '120 minutes / Stop Added', travelWindow: '+/- 2 days of original date', oalRebookingVal: 'ALLOWED', refundEligVal: 'YES',
-                    pureSkchg: {
-                        fields: [
-                            { label: 'Minor Change Profile', value: 'Delay less than 120 minutes with no itinerary misconnection.', allowed: true },
-                            { label: 'Major Change Profile', value: 'Delay of 120+ minutes / Added routing stops / Mainline-to-Connection equipment swap / Flight cancellations.', allowed: true },
-                            { label: 'Cabin Matching Rules', value: 'Cabin to Cabin matching strictly required.', allowed: false },
-                            { label: 'Booking Class (RBD) Rules', value: 'Same Class if available; fallback to next available class up to Y Class.', allowed: true },
-                            { label: 'Inventory Fallback Target', value: 'Same class preferred; Main Cabin up to Y Class fallback.', allowed: true },
-                            { label: 'Endorsement Box Waiver Text', value: 'None Needed', allowed: true },
-                            { label: 'Geo Airport Allowance Map', value: 'Alternate airport rebooking allowed within 100 Mile radius.', allowed: true },
-                            { label: 'Involuntary Cancel Refund', value: 'Full Refund Authorized', allowed: true },
-                            { label: 'Significant Change Trigger', value: '120 minutes delay / Added stops / Cancellations.', allowed: true },
-                            { label: 'Involuntary Admin Penalties', value: 'None. Failure to follow rules may result in an ADM.', allowed: true },
-                            { label: 'GDS Cash Refund Waiver Code', value: 'Exempt via GDS verification rule', allowed: true },
-                            { label: 'GDS OSI / Tour Code Box', value: 'OSI DL REFUNDED PER UNACCEPTABLE SKED CHG/ DATE', allowed: true },
-                            { label: 'Policy if Main Airline Causes Change', value: 'Full rebooking supported inside identical cabin classes maximum mapping threshold frames.', allowed: true },
-                            { label: 'SKCHG Contact Email', value: 'global.salessupport@delta.com', allowed: true },
-                            { label: 'SKCHG Contact Phone', value: '+1 800 241 4141', allowed: true }
-                        ]
-                    },
-                    pureName: {
-                        fields: [
-                            { label: 'Self-Service Typo Tolerance Threshold', value: 'Up to 3 characters free in first or middle names.', allowed: true },
-                            { label: 'Legal / Marriage Changes', value: 'Allowed with official decree documents.', allowed: true },
-                            { label: 'Change Penalties / Fees', value: 'Free for minor typos.', allowed: true },
-                            { label: 'Reissue / Swap Command', value: 'OSI DL NAME CORRECTION SEC', allowed: true },
-                            { label: 'OSI Formatting String', value: 'OS DL REISSUE TYPO CORR', allowed: true },
-                            { label: 'Nickname / Alternative Variant Mapping', value: 'Bilateral match processing rules dictate swap allowances.', allowed: true },
-                            { label: 'Inverted Given/Surname Sequence Rules', value: 'Supported via manual support entries.', allowed: true },
-                            { label: 'Adding Second First/Middle/Last Names', value: 'Allowed with complete travel document verification.', allowed: true },
-                            { label: 'Technical Infrastructure Restrictions', value: 'FQTV elements must be cleared.', allowed: false },
-                            { label: 'Non-Feasible Secondary Workarounds', value: 'Manual re-routing or waiver token authorization.', allowed: true },
-                            { label: 'Name Contact Email', value: 'trade.support@delta.com', allowed: true },
-                            { label: 'Name Contact Phone', value: '+1 800 325 1551', allowed: true }
-                        ]
-                    },
-                    oalSkchg: {
-                        fields: [
-                            { label: 'Minor Change Profile', value: 'OAL minor variations subject to trade support desk balance checks.', allowed: true },
-                            { label: 'Major Change Profile', value: 'Joint Venture codeshare changes (AF/KL/VS) allow open availability mappings.', allowed: true },
-                            { label: 'Rebooking Order Priority', value: '1. DL* Joint Venture Codeshare (AF/KL/VS) -> 2. SkyTeam Alliances Network.', allowed: true },
-                            { label: 'Alliance Rebooking Allowance', value: 'SkyTeam operating partners available for priority protection routes.', allowed: true },
-                            { label: 'Codeshare / Interline Mapping', value: 'May rebook ticketed DL* flight on operating prime flight when codeshare equivalent is dropped.', allowed: true },
-                            { label: 'Policy if Codeshare/OAL Partner Causes Change', value: 'Joint Venture codeshare changes (AF/KL/VS) allow open availability mappings. Pure OAL changes must go through support.', allowed: false },
-                            { label: 'Refund Policy if Codeshare/OAL Partner Causes Change', value: 'Applies to DL codeshare or interline segments when partner delays create misconnections exceeding 120 minutes.', allowed: true },
-                            { label: 'OAL Support Email', value: 'global.salessupport@delta.com', allowed: true },
-                            { label: 'OAL Support Phone', value: '+1 800 241 4141', allowed: true }
-                        ]
-                    },
-                    oalName: {
-                        fields: [
-                            { label: 'Name Correction Rules with Codeshare/OAL Flights', value: 'Name corrections are strictly prohibited on external interline ticket rows.', allowed: false },
-                            { label: 'Technical Sync Restrictions', value: 'Bilateral structural locks instantly sever connection loops on modified fields.', allowed: false },
-                            { label: 'Non-Feasible Secondary Workarounds', value: 'Direct connection support line intervention for manual waiver tokens.', allowed: true },
-                            { label: 'OAL Name Email', value: 'trade.support@delta.com', allowed: true },
-                            { label: 'OAL Name Phone', value: '+1 800 325 1551', allowed: true }
-                        ]
-                    }
-                },
-                {
-                    airlineName: 'WestJet Airlines', iata: 'WS', icao: 'WJA', logo: '🍁', lastUpdated: '2026-06-26',
-                    policyWebLink: 'https://www.westjet.com/en-ca/travel-agents', policyPdfLink: '',
-                    threshold: '181 minutes', travelWindow: '+/-2 days original dates', oalRebookingVal: 'ALLOWED', refundEligVal: 'YES',
-                    pureSkchg: {
-                        fields: [
-                            { label: 'Minor Change Profile', value: 'Less than 181 minutes time gap layout change.', allowed: true },
-                            { label: 'Major Change Profile', value: '181 minutes or more (3+ Hours) time variation change.', allowed: true },
-                            { label: 'Cabin Matching Rules', value: 'Same Cabin Balance Required.', allowed: false },
-                            { label: 'Booking Class (RBD) Rules', value: 'Lowest Class Allowed Fallback inside cabin.', allowed: true },
-                            { label: 'Inventory Fallback Target', value: 'Next highest up to Y (Eco) / W (Prem) / J (Biz).', allowed: true },
-                            { label: 'Endorsement Box Waiver Text', value: 'SKCHG', allowed: true },
-                            { label: 'Geo Airport Allowance Map', value: 'Within 320 km / 200 miles (e.g. YVR/YXX)', allowed: true },
-                            { label: 'Involuntary Cancel Refund', value: 'Full Refund Authorized', allowed: true },
-                            { label: 'Significant Change Trigger', value: '181 minutes', allowed: true },
-                            { label: 'Involuntary Admin Penalties', value: 'None for involuntary', allowed: true },
-                            { label: 'GDS Cash Refund Waiver Code', value: 'Q21SKDRF22', allowed: true },
-                            { label: 'GDS OSI / Tour Code Box', value: 'None Specified', allowed: true },
-                            { label: 'Policy if Main Airline Causes Change', value: 'Full automated reissue allowed on WestJet flights into identical cabins matching original routing loops.', allowed: true },
-                            { label: 'SKCHG Contact Email', value: 'agencysalessupport@westjet.com', allowed: true },
-                            { label: 'SKCHG Contact Phone', value: '+1 877 664 3205', allowed: true }
-                        ]
-                    },
-                    pureName: {
-                        fields: [
-                            { label: 'Self-Service Typo Tolerance Threshold', value: 'First or middle name up to 3 chars.', allowed: true },
-                            { label: 'Legal / Marriage Changes', value: 'Marriage/Divorce certificates accepted.', allowed: true },
-                            { label: 'Change Penalties / Fees', value: 'UltraBasic excluded, others free for typos.', allowed: true },
-                            { label: 'Reissue / Swap Command', value: 'CHNE/GDS PRIME SWAP', allowed: true },
-                            { label: 'OSI Formatting String', value: 'OS WS TYPO CORR', allowed: true },
-                            { label: 'Nickname / Alternative Variant Mapping', value: 'Subject to standard name modification thresholds', allowed: true },
-                            { label: 'Inverted Given/Surname Sequence Rules', value: 'Re-sync parameters available', allowed: true },
-                            { label: 'Adding Second First/Middle/Last Names', value: 'Appended upon strict manifest matching criteria', allowed: true },
-                            { label: 'Technical Infrastructure Restrictions', value: 'FQTV lines must be dropped beforehand', allowed: false },
-                            { label: 'Non-Feasible Secondary Workarounds', value: 'SSR elements insertion workaround entries', allowed: true },
-                            { label: 'Name Contact Email', value: 'trade.support@westjet.com', allowed: true },
-                            { label: 'Name Contact Phone', value: '+1 888 937 8538', allowed: true }
-                        ]
-                    },
-                    oalSkchg: {
-                        fields: [
-                            { label: 'Minor Change Profile', value: 'OAL minor loops follow commercial interline partner bilateral code rules.', allowed: true },
-                            { label: 'Major Change Profile', value: 'Partner disruption changes require active reprotection on codeshare nodes.', allowed: true },
-                            { label: 'Endorsement Box Waiver Text', value: 'SKCHG OAL CODESHARE', allowed: true },
-                            { label: 'Rebooking Order Priority', value: '1. WestJet Prime -> 2. Commercial partner network agreements.', allowed: true },
-                            { label: 'Alliance Rebooking Allowance', value: 'Non-alliance point-to-point interline rules apply as designated by commercial bilateral code books.', allowed: true },
-                            { label: 'Codeshare / Interline Mapping', value: 'Pure operating code lines prioritized over complex multi-segment codeshare sectors.', allowed: true },
-                            { label: 'Policy if Codeshare/OAL Partner Causes Change', value: 'Rebooking on non-alliance commercial partner flights applies only if prime options are dropped entirely.', allowed: false },
-                            { label: 'Refund Policy if Codeshare/OAL Partner Causes Change', value: 'Permitted if partner flight drops affect connecting flights and exceed 181+ minutes.', allowed: true },
-                            { label: 'OAL Support Email', value: 'agencysalessupport@westjet.com', allowed: true },
-                            { label: 'OAL Support Phone', value: '+1 877 664 3205', allowed: true }
-                        ]
-                    },
-                    oalName: {
-                        fields: [
-                            { label: 'Name Correction Rules with Codeshare/OAL Flights', value: 'Bilateral commercial rules state that OAL partner segments must be cleared before agents manually force name updates over GDS PNR fields.', allowed: false },
-                            { label: 'Technical Sync Restrictions', value: 'Split functions must execute prior to modifying profile nodes.', allowed: false },
-                            { label: 'Non-Feasible Secondary Workarounds', value: 'Direct connection support line intervention.', allowed: true },
-                            { label: 'OAL Name Email', value: 'trade.support@westjet.com', allowed: true },
-                            { label: 'OAL Name Phone', value: '+1 888 937 8538', allowed: true }
+                                { label: 'OAL Name Phone', value: '+1 888 247 2262', allowed: true }
                         ]
                     }
                 }
@@ -435,7 +377,7 @@
                     <div class="space-y-1.5 max-h-[300px] overflow-y-auto pr-1">
                         <template x-for="airline in filteredAirlines" :key="airline.iata">
                             <div class="flex items-center space-x-1">
-                                <button @click="selectedAirline = airline" :class="selectedAirline && selectedAirline.iata === airline.iata ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-lg' : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800/60'" class="w-full text-left p-3 rounded-lg flex justify-between items-center transition">
+                                <button @click="selectedAirline = airline" :class="selectedAirline && selectedAirline.iata === airline.iata ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-lg' : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800/60'" class="flex-1 text-left p-3 rounded-lg flex justify-between items-center transition">
                                     <div class="flex items-center space-x-3"><span class="text-lg" x-text="airline.logo"></span><span class="font-semibold text-sm" x-text="airline.airlineName"></span></div>
                                     <span class="font-mono text-xs opacity-70" x-text="'[' + airline.iata + ']'"></span>
                                 </button>
@@ -462,12 +404,12 @@
                         <h3 class="text-sm font-bold text-amber-400 tracking-wider uppercase">INJECT NEW FLEET POLICY RULESET</h3>
                         <button @click="resetForm()" class="bg-slate-800 text-xs px-2.5 py-1 rounded text-slate-300">Clear Form</button>
                     </div>
-
+                    
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
-                        <div><label class="block text-slate-400 mb-1">Airline Name</label><input type="text" x-model="formAirline.airlineName" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded" /></div>
-                        <div><label class="block text-slate-400 mb-1">IATA Code</label><input type="text" x-model="formAirline.iata" :disabled="isEditing" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded" /></div>
-                        <div><label class="block text-slate-400 mb-1">SKD CHG Trigger Metric</label><input type="text" x-model="formAirline.threshold" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded" /></div>
-                        <div><label class="block text-slate-400 mb-1">Travel Window Metric</label><input type="text" x-model="formAirline.travelWindow" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded" /></div>
+                        <div><label class="block font-semibold text-slate-400 mb-1">Airline Name</label><input type="text" x-model="formAirline.airlineName" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded text-white" /></div>
+                        <div><label class="block font-semibold text-slate-400 mb-1">IATA Code</label><input type="text" x-model="formAirline.iata" :disabled="isEditing" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded text-white" /></div>
+                        <div><label class="block font-semibold text-slate-400 mb-1">SKD CHG Trigger Metric</label><input type="text" x-model="formAirline.threshold" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded" /></div>
+                        <div><label class="block font-semibold text-slate-400 mb-1">Travel Window Metric</label><input type="text" x-model="formAirline.travelWindow" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded" /></div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs pt-2">
