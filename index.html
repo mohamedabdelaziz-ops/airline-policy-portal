@@ -48,7 +48,7 @@
         newCustomLabel: '',
         newCustomValue: '',
         newCustomStatus: true,
-        targetSubColumn: 'skchg', // Can be 'skchg' or 'refund' for change tabs
+        targetSubColumn: 'skchg', 
 
         i18n: {
             en: {
@@ -133,6 +133,19 @@
         },
 
         init() {
+            // 🛠️ ATTEMPT PERSISTED LOCALSTORAGE LOAD FIRST, OR FALLBACK TO BASELINE SEED
+            const localSavedData = localStorage.getItem('disruption_desk_fleet_data');
+            if(localSavedData) {
+                try {
+                    this.airlines = JSON.parse(localSavedData);
+                    this.selectedAirline = this.airlines[0];
+                    return;
+                } catch(e) {
+                    console.error('Storage payload corrupted, resetting database models.');
+                }
+            }
+
+            // Default fallback snapshot dataset
             this.airlines = [
                 {
                     airlineName: 'WestJet Airlines', iata: 'WS', icao: 'WJA', logo: '🍁', lastUpdated: '2026-06-26',
@@ -282,6 +295,8 @@
                 }
             ];
             this.selectedAirline = this.airlines[0]; 
+            // Save defaults locally initially
+            localStorage.setItem('disruption_desk_fleet_data', JSON.stringify(this.airlines));
         },
         get filteredAirlines() {
             if (!this.searchQuery) return this.airlines;
@@ -334,6 +349,10 @@
             } else {
                 this.airlines.push(JSON.parse(JSON.stringify(this.formAirline)));
             }
+            
+            // 🛠️ SAVE TO PERSISTENT BROWSER MEMORY STORAGE
+            localStorage.setItem('disruption_desk_fleet_data', JSON.stringify(this.airlines));
+            
             this.selectedAirline = this.airlines[this.airlines.length - 1];
             this.isEditing = false; this.isAdminMode = false;
         },
@@ -485,13 +504,13 @@
                             <button type="button" @click="addCustomField(activePolicy)" class="md:col-span-4 w-full py-2 bg-indigo-600 hover:bg-indigo-500 font-bold uppercase rounded text-[10px] transition">➕ Inject Variable Node Row Field Into Dynamic View</button>
                         </div>
 
-                        <div class="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+                        <div class="space-y-4 max-h-[400px] overflow-y-auto pr-1">
                             
                             <template x-if="activePolicy.includes('skchg')">
                                 <div class="space-y-6">
                                     <div class="border-b border-slate-800 pb-2"><h4 class="text-sky-400 font-bold uppercase tracking-wider text-xs">📝 Column A: Schedule Change Framework fields</h4></div>
                                     <template x-for="(field, index) in formAirline[activePolicy === 'pure_skchg' ? 'pureSkchg' : 'oalSkchg'].skchgFields" :key="'edit-skchg-'+index">
-                                        <div class="bg-[#0b1329] border border-slate-800 p-2 rounded-lg flex flex-col md:flex-row items-start md:items-center gap-3 text-xs">
+                                        <div class="bg-[#0b1329] border border-slate-800 p-2 rounded-lg flex flex-col md:flex-row items-start md:items-center gap-3 text-xs shadow-md">
                                             <div class="w-full md:w-1/3"><input type="text" x-model="field.label" class="w-full bg-slate-950 border border-slate-800 p-1.5 rounded font-bold text-sky-400" /></div>
                                             <div class="flex-1 w-full"><textarea x-model="field.value" class="w-full bg-slate-950 border border-slate-800 p-1.5 rounded text-slate-200" rows="1"></textarea></div>
                                             <div class="flex items-center space-x-2">
@@ -506,7 +525,7 @@
 
                                     <div class="border-b border-slate-800 pb-2 pt-2"><h4 class="text-emerald-400 font-bold uppercase tracking-wider text-xs">📝 Column B: Refund Protocols fields</h4></div>
                                     <template x-for="(field, index) in formAirline[activePolicy === 'pure_skchg' ? 'pureSkchg' : 'oalSkchg'].refundFields" :key="'edit-refund-'+index">
-                                        <div class="bg-[#0b1329] border border-slate-800 p-2 rounded-lg flex flex-col md:flex-row items-start md:items-center gap-3 text-xs">
+                                        <div class="bg-[#0b1329] border border-slate-800 p-2 rounded-lg flex flex-col md:flex-row items-start md:items-center gap-3 text-xs shadow-md">
                                             <div class="w-full md:w-1/3"><input type="text" x-model="field.label" class="w-full bg-slate-950 border border-slate-800 p-1.5 rounded font-bold text-emerald-400" /></div>
                                             <div class="flex-1 w-full"><textarea x-model="field.value" class="w-full bg-slate-950 border border-slate-800 p-1.5 rounded text-slate-200" rows="1"></textarea></div>
                                             <div class="flex items-center space-x-2">
@@ -524,7 +543,7 @@
                             <template x-if="!activePolicy.includes('skchg')">
                                 <div class="space-y-2">
                                     <template x-for="(field, index) in formAirline[activePolicy === 'pure_name' ? 'pureName' : 'oalName'].fields" :key="'edit-name-'+index">
-                                        <div class="bg-[#0b1329] border border-slate-800 p-2 rounded-lg flex flex-col md:flex-row items-start md:items-center gap-3 text-xs">
+                                        <div class="bg-[#0b1329] border border-slate-800 p-2 rounded-lg flex flex-col md:flex-row items-start md:items-center gap-3 text-xs shadow-md">
                                             <div class="w-full md:w-1/3"><input type="text" x-model="field.label" class="w-full bg-slate-950 border border-slate-800 p-1.5 rounded font-bold text-purple-400" /></div>
                                             <div class="flex-1 w-full"><textarea x-model="field.value" class="w-full bg-slate-950 border border-slate-800 p-1.5 rounded text-slate-200" rows="1"></textarea></div>
                                             <div class="w-full md:w-auto flex items-center space-x-3 pt-3 md:pt-0">
@@ -650,7 +669,7 @@
 
                                         <template x-if="!activePolicy.includes('skchg')">
                                             <div class="space-y-4">
-                                                <p class="text-slate-500 italic text-center py-4">Workstation rules and reissuing formatting sequences are fully synced under the Primary Targets board directory.</p>
+                                                <p class="text-slate-500 italic text-center py-4">Workstation layout commands, rules, and system formats are synced directly under the Primary targets panel view matrix.</p>
                                             </div>
                                         </template>
                                     </div>
