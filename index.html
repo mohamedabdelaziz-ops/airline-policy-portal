@@ -20,10 +20,35 @@
         activePolicy: 'pure_skchg', 
         airlines: [],
 
+        // Time Converter State (12-Hour AM/PM Native Format)
+        zuluInput: '12:00',
+        get estOutput() {
+            if(!this.zuluInput) return '--:-- --';
+            try {
+                const parts = this.zuluInput.split(':');
+                if(parts.length !== 2) return '--:-- --';
+                let hours = parseInt(parts[0], 10);
+                const minutes = parts[1];
+                if(isNaN(hours) || hours < 0 || hours > 23) return '--:-- --';
+                
+                let estHours = hours - 5;
+                if (estHours < 0) estHours += 24;
+                const ampm = estHours >= 12 ? 'PM' : 'AM';
+                
+                estHours = estHours % 12;
+                if (estHours === 0) estHours = 12; 
+                
+                return String(estHours).padStart(2, '0') + ':' + minutes + ' ' + ampm;
+            } catch(e) {
+                return '--:-- --';
+            }
+        },
+
         // Dynamic additions state manager
         newCustomLabel: '',
         newCustomValue: '',
         newCustomStatus: true,
+        targetSubColumn: 'skchg', // Can be 'skchg' or 'refund' for change tabs
 
         i18n: {
             en: {
@@ -86,13 +111,12 @@
             airlineName: '', iata: '', icao: '', logo: '✈️', lastUpdated: '2026-06-29',
             policyWebLink: '', policyPdfLink: '',
             threshold: '', travelWindow: '', oalRebookingVal: 'ALLOWED', refundEligVal: 'YES',
-            pureSkchg: { fields: [] },
+            pureSkchg: { skchgFields: [], refundFields: [] },
             pureName: { fields: [] },
-            oalSkchg: { fields: [] },
+            oalSkchg: { skchgFields: [], refundFields: [] },
             oalName: { fields: [] }
         },
 
-        // Helper to check if a specific field label contains internal technical words
         isInternalField(label) {
             const lowerLabel = label.toLowerCase();
             return lowerLabel.includes('gds') || 
@@ -115,22 +139,24 @@
                     policyWebLink: 'https://www.westjet.com/en-ca/travel-agents', policyPdfLink: '',
                     threshold: '181 minutes', travelWindow: '+/-2 days original dates', oalRebookingVal: 'ALLOWED', refundEligVal: 'YES',
                     pureSkchg: {
-                        fields: [
+                        skchgFields: [
                             { label: 'MINOR CHANGE PROFILE', value: 'Less than 181 minutes time gap layout change.', allowed: true },
-                            { label: 'MAJOR CHANGE PROFILE', value: '181 minutes or more (3+ Hours) time variation change.', allowed: true },
                             { label: 'CABIN MATCHING RULES', value: 'Same Cabin Balance Required.', allowed: false },
-                            { label: 'BOOKING CLASS (RBD) RULES', value: 'Lowest Class Allowed Fallback inside cabin.', allowed: true },
                             { label: 'INVENTORY FALLBACK TARGET', value: 'Next highest up to Y (Eco) / W (Prem) / J (Biz).', allowed: true },
-                            { label: 'ENDORSEMENT BOX WAIVER TEXT', value: 'SKCHG', allowed: true },
                             { label: 'GEO AIRPORT ALLOWANCE MAP', value: 'Within 320 km / 200 miles (e.g. YVR/YXX)', allowed: true },
-                            { label: 'INVOLUNTARY CANCEL REFUND', value: 'Full Refund Authorized', allowed: true },
                             { label: 'SIGNIFICANT CHANGE TRIGGER', value: '181 minutes', allowed: true },
+                            { label: 'POLICY IF MAIN AIRLINE CAUSES CHANGE', value: 'Full automated reissue allowed on WestJet flights into identical cabins matching original routing loops.', allowed: true },
+                            { label: 'SKCHG CONTACT PHONE', value: '+1 877 664 3205', allowed: true }
+                        ],
+                        refundFields: [
+                            { label: 'MAJOR CHANGE PROFILE', value: '181 minutes or more (3+ Hours) time variation change.', allowed: true },
+                            { label: 'BOOKING CLASS (RBD) RULES', value: 'Lowest Class Allowed Fallback inside cabin.', allowed: true },
+                            { label: 'ENDORSEMENT BOX WAIVER TEXT', value: 'SKCHG', allowed: true },
+                            { label: 'INVOLUNTARY CANCEL REFUND', value: 'Full Refund Authorized', allowed: true },
                             { label: 'INVOLUNTARY ADMIN PENALTIES', value: 'None for involuntary', allowed: true },
                             { label: 'GDS CASH REFUND WAIVER CODE', value: 'Q21SKDRF22', allowed: true },
                             { label: 'GDS OSI / TOUR CODE BOX', value: 'None Specified', allowed: true },
-                            { label: 'POLICY IF MAIN AIRLINE CAUSES CHANGE', value: 'Full automated reissue allowed on WestJet flights into identical cabins matching original routing loops.', allowed: true },
-                            { label: 'SKCHG CONTACT EMAIL', value: 'agencysalessupport@westjet.com', allowed: true },
-                            { label: 'SKCHG CONTACT PHONE', value: '+1 877 664 3205', allowed: true }
+                            { label: 'SKCHG CONTACT EMAIL', value: 'agencysalessupport@westjet.com', allowed: true }
                         ]
                     },
                     pureName: {
@@ -150,25 +176,27 @@
                         ]
                     },
                     oalSkchg: {
-                        fields: [
+                        skchgFields: [
                             { label: 'Minor Change Profile', value: 'OAL minor loops follow commercial interline partner bilateral code rules.', allowed: true },
-                            { label: 'Major Change Profile', value: 'Partner disruption changes require active reprotection on codeshare nodes.', allowed: true },
                             { label: 'Cabin Matching Rules', value: 'Cabin tier matching mandatory.', allowed: false },
-                            { label: 'Booking Class (RBD) Rules', value: 'Lowest class open in partner cabin tier.', allowed: true },
                             { label: 'Inventory Fallback Target', value: 'Next highest inventory mapping code rules.', allowed: true },
-                            { label: 'Endorsement Box Waiver Text', value: 'SKCHG OAL CODESHARE', allowed: true },
                             { label: 'Geo Airport Allowance Map', value: 'Partner interline route mappings active.', allowed: true },
                             { label: 'Rebooking Order Priority', value: '1. WestJet Prime -> 2. Commercial partner network agreements.', allowed: true },
-                            { label: 'Alliance Rebooking Allowance', value: 'Non-alliance point-to-point interline rules apply as designated by commercial bilateral code books.', allowed: true },
                             { label: 'Codeshare / Interline Mapping', value: 'Pure operating code lines prioritized over complex multi-segment codeshare sectors.', allowed: true },
+                            { label: 'Policy if Codeshare/OAL Partner Causes Change', value: 'Rebooking on non-alliance commercial partner flights applies only if prime options are dropped entirely.', allowed: false },
+                            { label: 'OAL Support Phone', value: '+1 877 664 3205', allowed: true }
+                        ],
+                        refundFields: [
+                            { label: 'Major Change Profile', value: 'Partner disruption changes require active reprotection on codeshare nodes.', allowed: true },
+                            { label: 'Booking Class (RBD) Rules', value: 'Lowest class open in partner cabin tier.', allowed: true },
+                            { label: 'Endorsement Box Waiver Text', value: 'SKCHG OAL CODESHARE', allowed: true },
+                            { label: 'Alliance Rebooking Allowance', value: 'Non-alliance point-to-point interline rules apply as designated by commercial bilateral code books.', allowed: true },
                             { label: 'Significant Change Trigger', value: '181+ minutes connector dropped', allowed: true },
                             { label: 'Involuntary Admin Penalties', value: 'Taxes L8/DO non-refundable for PUJ/POP/AZS/LRM', allowed: true },
                             { label: 'GDS Cash Refund Waiver Code', value: 'Q21SKDRF22 OAL', allowed: true },
                             { label: 'GDS OSI / Tour Code Box', value: 'OSI WS INVOL SKCHG WITH CODESHARE PARTNER', allowed: true },
-                            { label: 'Policy if Codeshare/OAL Partner Causes Change', value: 'Rebooking on non-alliance commercial partner flights applies only if prime options are dropped entirely.', allowed: false },
                             { label: 'Refund Policy if Codeshare/OAL Partner Causes Change', value: 'Permitted if partner flight drops affect connecting flights and exceed 181+ minutes.', allowed: true },
-                            { label: 'OAL Support Email', value: 'agencysalessupport@westjet.com', allowed: true },
-                            { label: 'OAL Support Phone', value: '+1 877 664 3205', allowed: true }
+                            { label: 'OAL Support Email', value: 'agencysalessupport@westjet.com', allowed: true }
                         ]
                     },
                     oalName: {
@@ -186,22 +214,24 @@
                     policyWebLink: 'https://www.lufthansagroup.com/en/themes/agency-support.html', policyPdfLink: '',
                     threshold: 'Varies by destination routing attributes', travelWindow: 'Subject to inventory controls.', oalRebookingVal: 'PROHIBITED', refundEligVal: 'YES',
                     pureSkchg: {
-                        fields: [
+                        skchgFields: [
                             { label: 'MINOR CHANGE PROFILE', value: 'Time deviations below airline-defined threshold limits.', allowed: true },
-                            { label: 'MAJOR CHANGE PROFILE', value: 'Significant operation adjustments or scheduling cancellations.', allowed: true },
                             { label: 'CABIN MATCHING RULES', value: 'Strict Cabin Balance Required.', allowed: false },
-                            { label: 'BOOKING CLASS (RBD) RULES', value: 'Rebook original RBD class configuration if active.', allowed: true },
                             { label: 'INVENTORY FALLBACK TARGET', value: 'Original booking class preferred.', allowed: true },
-                            { label: 'ENDORSEMENT BOX WAIVER TEXT', value: 'DUE SKCH', allowed: true },
                             { label: 'GEO AIRPORT ALLOWANCE MAP', value: 'Bilateral alternate rerouting constraints apply.', allowed: false },
+                            { label: 'POLICY IF MAIN AIRLINE CAUSES CHANGE', value: 'Full complimentary reinstatement into original RBD on new PNR. If closed, rebook next open class inside original cabin.', allowed: true },
+                            { label: 'SKCHG CONTACT PHONE', value: '+49 69 86 799 799', allowed: true }
+                        ],
+                        refundFields: [
+                            { label: 'MAJOR CHANGE PROFILE', value: 'Significant operation adjustments or scheduling cancellations.', allowed: true },
+                            { label: 'BOOKING CLASS (RBD) RULES', value: 'Rebook original RBD class configuration if active.', allowed: true },
+                            { label: 'ENDORSEMENT BOX WAIVER TEXT', value: 'DUE SKCH', allowed: true },
                             { label: 'INVOLUNTARY CANCEL REFUND', value: 'Full Refund Authorized', allowed: true },
                             { label: 'SIGNIFICANT CHANGE TRIGGER', value: 'More than 3 hours deviation or cancel with no acceptable protection available.', allowed: true },
                             { label: 'INVOLUNTARY ADMIN PENALTIES', value: 'None', allowed: true },
                             { label: 'GDS CASH REFUND WAIVER CODE', value: 'System Verified', allowed: true },
                             { label: 'GDS OSI / TOUR CODE BOX', value: 'OS LH INVOL SKCHG', allowed: true },
-                            { label: 'POLICY IF MAIN AIRLINE CAUSES CHANGE', value: 'Full complimentary reinstatement into original RBD on new PNR. If closed, rebook next open class inside original cabin.', allowed: true },
-                            { label: 'SKCHG CONTACT EMAIL', value: 'agency.support@lufthansagroup.com', allowed: true },
-                            { label: 'SKCHG CONTACT PHONE', value: '+49 69 86 799 799', allowed: true }
+                            { label: 'SKCHG CONTACT EMAIL', value: 'agency.support@lufthansagroup.com', allowed: true }
                         ]
                     },
                     pureName: {
@@ -221,17 +251,23 @@
                         ]
                     },
                     oalSkchg: {
-                        fields: [
+                        skchgFields: [
                             { label: 'Minor Change Profile', value: 'OAL minor changes follow standard interline code agreements.', allowed: true },
+                            { label: 'Cabin mapping map', value: 'Cabin mapping required.', allowed: true },
+                            { label: 'Lowest class allowed', value: 'Lowest available class in same cabin.', allowed: true },
+                            { label: 'Interline constraints map', value: 'Interline route restrictions apply.', allowed: true },
+                            { label: 'Alliance rebooking framework', value: 'Star Alliance carriers fully authorized inside identical cabin maps.', allowed: true },
+                            { label: 'Policy if Codeshare/OAL Partner Causes Change', value: 'Lufthansa Group support cannot assist with flight confirmations on other airlines. Fare differences apply if confirmed in higher GDS class.', allowed: false },
+                            { label: 'OAL Support Phone', value: '+49 69 86 799 900', allowed: true }
+                        ],
+                        refundFields: [
                             { label: 'Major Change Profile', value: 'Flight confirmations for higher booking classes are subject to fare differences if original class closed.', allowed: true },
+                            { label: 'Booking Class Rebook Code', value: 'Rebook next higher open RBD if original closed.', allowed: true },
                             { label: 'Endorsement Box Waiver Text', value: 'DUE SKCH OAL', allowed: true },
                             { label: 'Rebooking Order Priority', value: '1. Star Alliance Partner -> 2. Other Interline partners.', allowed: true },
-                            { label: 'Alliance Rebooking Allowance', value: 'Star Alliance carriers fully authorized inside identical cabin maps.', allowed: true },
                             { label: 'Codeshare / Interline Mapping', value: 'Rebook on operating prime flight if marketing codeshare code drops.', allowed: true },
-                            { label: 'Policy if Codeshare/OAL Partner Causes Change', value: 'Lufthansa Group support cannot assist with flight confirmations on other airlines. Fare differences apply if confirmed in higher GDS class.', allowed: false },
                             { label: 'Refund Policy if Codeshare/OAL Partner Causes Change', value: 'Authorized if the partner airline changes cause a structural misconnect or delay over 3 hours.', allowed: true },
-                            { label: 'OAL Support Email', value: 'oal.support@lufthansagroup.com', allowed: true },
-                            { label: 'OAL Support Phone', value: '+49 69 86 799 900', allowed: true }
+                            { label: 'OAL Support Email', value: 'oal.support@lufthansagroup.com', allowed: true }
                         ]
                     },
                     oalName: {
@@ -241,75 +277,6 @@
                             { label: 'Non-Feasible Secondary Workarounds', value: 'Create entirely new PNR matching valid travel docs.', allowed: true },
                             { label: 'OAL Name Email', value: 'oal.support@lufthansagroup.com', allowed: true },
                             { label: 'OAL Name Phone', value: '+49 69 86 799 900', allowed: true }
-                        ]
-                    }
-                },
-                {
-                    airlineName: 'Air Canada', iata: 'AC', icao: 'ACA', logo: '🇨🇦', lastUpdated: '2026-06-27',
-                    policyWebLink: 'https://www.aircanada.com/agency', policyPdfLink: '',
-                    threshold: '60 minutes', travelWindow: '+/-7 days (Sun/Intl market up to +/-30 days)', oalRebookingVal: 'ALLOWED', refundEligVal: 'YES',
-                    pureSkchg: {
-                        fields: [
-                            { label: 'MINOR CHANGE PROFILE', value: 'Less than 60 minutes time deviation.', allowed: true },
-                            { label: 'MAJOR CHANGE PROFILE', value: '60 minutes or more / Operating carrier change / Stop added.', allowed: true },
-                            { label: 'CABIN MATCHING RULES', value: 'Strict Cabin Balance Required.', allowed: false },
-                            { label: 'BOOKING CLASS (RBD) RULES', value: 'Use original RBD. Fallback to lowest open code up to M class.', allowed: true },
-                            { label: 'INVENTORY FALLBACK TARGET', value: 'Original booking class preferred; up to Y class maximum fallback.', allowed: true },
-                            { label: 'ENDORSEMENT BOX WAIVER TEXT', value: 'DUE SKCH', allowed: true },
-                            { label: 'GEO AIRPORT ALLOWANCE MAP', value: 'Sister cities or alternate nodes within 200 miles radius permitted.', allowed: true },
-                            { label: 'INVOLUNTARY CANCEL REFUND', value: 'Full Refund Authorized', allowed: true },
-                            { label: 'SIGNIFICANT CHANGE TRIGGER', value: 'More than 3 hours deviation', allowed: true },
-                            { label: 'INVOLUNTARY ADMIN PENALTIES', value: 'None', allowed: true },
-                            { label: 'GDS CASH REFUND WAIVER CODE', value: 'ACUSKEDCHG + Flight Number', allowed: true },
-                            { label: 'GDS OSI / TOUR CODE BOX', value: 'OS AC INVOL SKCHG', allowed: true },
-                            { label: 'POLICY IF MAIN AIRLINE CAUSES CHANGE', value: 'Full complimentary rebooking on AC mainline flights inside identical cabins matching original routing loops.', allowed: true },
-                            { label: 'SKCHG CONTACT EMAIL', value: 'agency.support@aircanada.ca', allowed: true },
-                            { label: 'SKCHG CONTACT PHONE', value: '+1 888 247 2262', allowed: true }
-                        ]
-                    },
-                    pureName: {
-                        fields: [
-                            { label: 'Self-Service Typo Tolerance Threshold', value: 'Up to 3 characters free.', allowed: true },
-                            { label: 'Legal / Marriage Changes', value: 'Permitted with marriage certificate proof.', allowed: true },
-                            { label: 'Change Penalties / Fees', value: 'Free for typos, otherwise $50 CAD.', allowed: true },
-                            { label: 'Reissue / Swap Command', value: 'CHNH/LASTNAME/FIRSTNAME', allowed: true },
-                            { label: 'OSI Formatting String', value: 'OS AC CORR NAME', allowed: true },
-                            { label: 'Nickname / Alternative Variant Mapping', value: 'Handled via core desk parameters', allowed: true },
-                            { label: 'Inverted Given/Surname Sequence Rules', value: 'Supported if traveler identity matches completely', allowed: true },
-                            { label: 'Adding Second First/Middle/Last Names', value: 'Appended upon matching complete passport manifest', allowed: true },
-                            { label: 'Technical Infrastructure Restrictions', value: 'FQTV re-entry required', allowed: false },
-                            { label: 'Non-Feasible Secondary Workarounds', value: 'GDS native validation entry strings', allowed: true },
-                            { label: 'Name Contact Email', value: 'trade.ca@aircanada.ca', allowed: true },
-                            { label: 'Name Contact Phone', value: '+1 888 247 2262', allowed: true }
-                        ]
-                    },
-                    oalSkchg: {
-                        fields: [
-                            { label: 'Minor Change Profile', value: 'Flight time change less than 3 hours. Rebook within +/-3 days North America, +/-7 days other destinations.', allowed: true },
-                            { label: 'Major Change Profile', value: 'Flight time change of 3 hours or more, or flight cancellation. Action segment status changes within 14 days or 48 hours prior to departure.', allowed: true },
-                            { label: 'Cabin Matching Rules', value: 'Cabin to cabin rebooking required. PE/Rouge protection on airlines without PE must be rebooked in economy.', allowed: false },
-                            { label: 'Booking Class (RBD) Rules', value: 'Pure Star Alliance: book lowest available booking code in the same cabin. For other airlines, rebook same class up to Y.', allowed: true },
-                            { label: 'Inventory Fallback Target', value: 'Economy up to M class, Premium Economy up to O class, Business/Signature up to J class if original flight is subsequently reinstated.', allowed: true },
-                            { label: 'Endorsement Box Waiver Text', value: 'SKCHxxxx (flight number) (e.g., SKCH1234).', allowed: true },
-                            { label: 'Geo Airport Allowance Map', value: 'Alternate AC stations allowed within 200 miles radius (e.g., MIA and FLL). Same origin/destination and global direction must be respected.', allowed: true },
-                            { label: 'Rebooking Order Priority', value: '1. AC/Express/Rouge -> 2. Atlantic JV (AC, UA, LHG) -> 3. AC codeshare via Star Alliance -> 4. Pure Star Alliance -> 5. AC codeshare via other airlines -> 6. Other carriers -> 7. Australia/NZ via OAL -> 8. Pure Star Alliance/OAL.', allowed: true },
-                            { label: 'Alliance Rebooking Allowance', value: 'Pure Star Alliance allowed using lowest available code in same cabin. For Transatlantic over-the-water, use AC or Atlantic JV (AC, UA, LHG).', allowed: true },
-                            { label: 'Codeshare / Interline Mapping', value: 'Action status codes UN, NO, HX, WK, WL, WN, TK within 14 days or 48 hours prior to departure. Also action UC, US, or DS.', allowed: true },
-                            { label: 'GDS Cash Refund Waiver Code', value: 'Waiver Box: SKCH00 (flight number). Accessibility: ACCESSxxxx. Regrades: REGRADExxxx.', allowed: true },
-                            { label: 'GDS OSI / Tour Code Box', value: 'Add schedule change remarks on the PNR accordingly.', allowed: true },
-                            { label: 'Policy if Codeshare/OAL Partner Causes Change', value: 'If original flight is subsequently reinstated, you may rebook clients on original flight without penalty.', allowed: true },
-                            { label: 'Refund Policy if Codeshare/OAL Partner Causes Change', value: 'Permitted if delay is 3+ hours, cancellation, non-stop to connecting, more stops, or misconnection.', allowed: true },
-                            { label: 'OAL Support Email', value: 'agency.support@aircanada.ca', allowed: true },
-                            { label: 'OAL Support Phone', value: '+1 888 247 2262', allowed: true }
-                        ]
-                    },
-                    oalName: {
-                        fields: [
-                            { label: 'Name Correction Rules with Codeshare/OAL Flights', value: 'Manual name corrections are completely prohibited when other airline (OAL) sectors are live on the PNR.', allowed: false },
-                            { label: 'Technical Sync Restrictions', value: 'OAL channels automatically drop connection blocks if names are modified directly on original records.', allowed: false },
-                            { label: 'Non-Feasible Secondary Workarounds', value: 'Generate split profiles inside the native workstation system parameters.', allowed: true },
-                            { label: 'OAL Name Email', value: 'trade.ca@aircanada.ca', allowed: true },
-                            { label: 'OAL Name Phone', value: '+1 888 247 2262', allowed: true }
                         ]
                     }
                 }
@@ -333,16 +300,30 @@
         addCustomField(pillar) {
             if(!this.newCustomLabel) return alert('Please enter a Field Title Name');
             const targetPillarKey = pillar === 'pure_skchg' ? 'pureSkchg' : pillar === 'pure_name' ? 'pureName' : pillar === 'oal_skchg' ? 'oalSkchg' : 'oalName';
-            this.formAirline[targetPillarKey].fields.push({
-                label: this.newCustomLabel,
-                value: this.newCustomValue,
-                allowed: this.newCustomStatus
-            });
+            
+            if(pillar.includes('skchg')) {
+                const subArray = this.targetSubColumn === 'skchg' ? 'skchgFields' : 'refundFields';
+                this.formAirline[targetPillarKey][subArray].push({
+                    label: this.newCustomLabel,
+                    value: this.newCustomValue,
+                    allowed: this.newCustomStatus
+                });
+            } else {
+                this.formAirline[targetPillarKey].fields.push({
+                    label: this.newCustomLabel,
+                    value: this.newCustomValue,
+                    allowed: this.newCustomStatus
+                });
+            }
             this.newCustomLabel = ''; this.newCustomValue = ''; this.newCustomStatus = true;
         },
-        removeCustomField(pillar, idx) {
+        removeCustomField(pillar, subType, idx) {
             const targetPillarKey = pillar === 'pure_skchg' ? 'pureSkchg' : pillar === 'pure_name' ? 'pureName' : pillar === 'oal_skchg' ? 'oalSkchg' : 'oalName';
-            this.formAirline[targetPillarKey].fields.splice(idx, 1);
+            if(pillar.includes('skchg')) {
+                this.formAirline[targetPillarKey][subType].splice(idx, 1);
+            } else {
+                this.formAirline[targetPillarKey].fields.splice(idx, 1);
+            }
         },
         saveAirline() {
             if(!this.formAirline.airlineName || !this.formAirline.iata) return alert('Airline data incomplete.');
@@ -365,7 +346,7 @@
             this.formAirline = {
                 airlineName: '', iata: '', icao: '', logo: '✈️', lastUpdated: '2026-06-29', policyWebLink: '', policyPdfLink: '',
                 threshold: '', travelWindow: '', oalRebookingVal: 'ALLOWED', refundEligVal: 'YES',
-                pureSkchg: { fields: [] }, pureName: { fields: [] }, oalSkchg: { fields: [] }, oalName: { fields: [] }
+                pureSkchg: { skchgFields: [], refundFields: [] }, pureName: { fields: [] }, oalSkchg: { skchgFields: [], refundFields: [] }, oalName: { fields: [] }
             };
             this.isEditing = false;
         }
@@ -405,6 +386,24 @@
         <main class="max-w-7xl mx-auto p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-4 gap-8 flex-1 w-full">
             
             <div class="lg:col-span-1 space-y-6">
+                
+                <div class="bg-gradient-to-br from-slate-900 to-indigo-950/40 border border-slate-800 p-5 rounded-xl shadow-xl space-y-3">
+                    <div class="flex items-center space-x-2 border-b border-slate-800 pb-2">
+                        <span class="text-base">🕰️</span>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Zulu Time Converter</h4>
+                    </div>
+                    <div class="space-y-2">
+                        <div>
+                            <label class="block text-[10px] uppercase text-slate-400 mb-1">Input Zulu Time (24h)</label>
+                            <input type="time" x-model="zuluInput" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white font-mono text-sm focus:outline-none focus:ring-1 focus:ring-sky-500" />
+                        </div>
+                        <div class="bg-slate-950/80 border border-slate-800 p-2.5 rounded-lg flex justify-between items-center">
+                            <span class="text-[10px] uppercase text-slate-400 font-semibold">EST Equivalent:</span>
+                            <span class="text-xs font-bold font-mono text-sky-400" x-text="estOutput"></span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl shadow-xl space-y-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2" x-text="i18n[currentLang].searchLabel"></label>
@@ -417,7 +416,7 @@
                     <div class="space-y-1.5 max-h-[300px] overflow-y-auto pr-1">
                         <template x-for="airline in filteredAirlines" :key="airline.iata">
                             <div class="flex items-center space-x-1">
-                                <button @click="selectedAirline = airline" :class="selectedAirline && selectedAirline.iata === airline.iata ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-lg' : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800/60'" class="w-full text-left p-3 rounded-lg flex justify-between items-center transition">
+                                <button @click="selectedAirline = airline" :class="selectedAirline && selectedAirline.iata === airline.iata ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-lg' : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800/60'" class="flex-1 text-left p-3 rounded-lg flex justify-between items-center transition">
                                     <div class="flex items-center space-x-3"><span class="text-lg" x-text="airline.logo"></span><span class="font-semibold text-sm" x-text="airline.airlineName"></span></div>
                                     <span class="font-mono text-xs opacity-70" x-text="'[' + airline.iata + ']'"></span>
                                 </button>
@@ -444,12 +443,12 @@
                         <h3 class="text-sm font-bold text-amber-400 tracking-wider uppercase">INJECT NEW FLEET POLICY RULESET</h3>
                         <button @click="resetForm()" class="bg-slate-800 text-xs px-2.5 py-1 rounded text-slate-300">Clear Form</button>
                     </div>
-
+                    
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
-                        <div><label class="block text-slate-400 mb-1">Airline Name</label><input type="text" x-model="formAirline.airlineName" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded text-white" /></div>
-                        <div><label class="block text-slate-400 mb-1">IATA Code</label><input type="text" x-model="formAirline.iata" :disabled="isEditing" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded text-white" /></div>
-                        <div><label class="block text-amber-400 mb-1">SKD CHG Trigger Metric</label><input type="text" x-model="formAirline.threshold" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded" /></div>
-                        <div><label class="block text-sky-400 mb-1">Travel Window Metric</label><input type="text" x-model="formAirline.travelWindow" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded" /></div>
+                        <div><label class="block font-semibold text-slate-400 mb-1">Airline Name</label><input type="text" x-model="formAirline.airlineName" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded text-white" /></div>
+                        <div><label class="block font-semibold text-slate-400 mb-1">IATA Code</label><input type="text" x-model="formAirline.iata" :disabled="isEditing" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded text-white" /></div>
+                        <div><label class="block font-semibold text-amber-400 mb-1">SKD CHG Trigger Metric</label><input type="text" x-model="formAirline.threshold" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded" /></div>
+                        <div><label class="block font-semibold text-sky-400 mb-1">Travel Window Metric</label><input type="text" x-model="formAirline.travelWindow" class="w-full bg-[#070b19] border border-slate-800 p-2 rounded" /></div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs pt-2">
@@ -463,7 +462,10 @@
                         
                         <div class="p-3 bg-slate-950 border border-dashed border-slate-800 rounded-lg grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
                             <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">New Custom Field Title</label><input type="text" x-model="newCustomLabel" placeholder="e.g. EXTRA FIELD LABEL" class="w-full bg-[#070b19] border border-slate-800 p-1.5 rounded text-white" /></div>
-                            <div class="md:col-span-2"><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Guideline Policy Descriptions Content</label><input type="text" x-model="newCustomValue" placeholder="Description content string goes here..." class="w-full bg-[#070b19] border border-slate-800 p-1.5 rounded text-white" /></div>
+                            <div class="md:col-span-2">
+                                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Guideline Policy Descriptions Content</label>
+                                <input type="text" x-model="newCustomValue" placeholder="Description content string goes here..." class="w-full bg-[#070b19] border border-slate-800 p-1.5 rounded text-white" />
+                            </div>
                             <div>
                                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Validation Seal Stamp</label>
                                 <div class="flex border border-slate-800 rounded overflow-hidden p-0.5 bg-[#070b19]">
@@ -471,29 +473,72 @@
                                     <button type="button" @click="newCustomStatus = false" :class="!newCustomStatus ? 'bg-rose-600 font-bold' : 'text-slate-500'" class="flex-1 py-1 rounded text-[9px]">❌ PROHIB</button>
                                 </div>
                             </div>
+                            
+                            <template x-if="activePolicy.includes('skchg')">
+                                <div class="md:col-span-4 bg-slate-900 p-2 rounded border border-slate-800 flex items-center space-x-4">
+                                    <span class="text-slate-400 uppercase font-bold text-[9px]">Destination Target Sub-Column:</span>
+                                    <label class="flex items-center space-x-1"><input type="radio" value="skchg" x-model="targetSubColumn" /> <span>Schedule Change Framework</span></label>
+                                    <label class="flex items-center space-x-1"><input type="radio" value="refund" x-model="targetSubColumn" /> <span>Refund Protocols</span></label>
+                                </div>
+                            </template>
+
                             <button type="button" @click="addCustomField(activePolicy)" class="md:col-span-4 w-full py-2 bg-indigo-600 hover:bg-indigo-500 font-bold uppercase rounded text-[10px] transition">➕ Inject Variable Node Row Field Into Dynamic View</button>
                         </div>
 
-                        <div class="space-y-2 max-h-[400px] overflow-y-auto pr-1">
-                            <template x-for="(field, index) in formAirline[activePolicy === 'pure_skchg' ? 'pureSkchg' : activePolicy === 'pure_name' ? 'pureName' : activePolicy === 'oal_skchg' ? 'oalSkchg' : 'oalName'].fields" :key="index">
-                                <div class="bg-[#0b1329] border border-slate-800 p-2 rounded-lg flex flex-col md:flex-row items-start md:items-center gap-3 text-xs shadow-md">
-                                    <div class="w-full md:w-1/3">
-                                        <label class="block text-[9px] uppercase text-slate-500 mb-0.5">Field Variable Name (Changeable / Dynamic)</label>
-                                        <input type="text" x-model="field.label" class="w-full bg-slate-950 border border-slate-800 p-1.5 rounded font-bold text-sky-400" />
-                                    </div>
-                                    <div class="flex-1 w-full">
-                                        <label class="block text-[10px] uppercase text-slate-500 mb-0.5">Policy Content Guidelines Description</label>
-                                        <textarea x-model="field.value" class="w-full bg-slate-950 border border-slate-800 p-1.5 rounded text-slate-200" rows="1"></textarea>
-                                    </div>
-                                    <div class="w-full md:w-auto flex items-center space-x-3 pt-3 md:pt-0">
-                                        <div class="flex bg-slate-950 border border-slate-800 p-0.5 rounded">
-                                            <button type="button" @click="field.allowed = true" :class="field.allowed ? 'bg-emerald-600 text-white font-bold' : 'text-slate-500'" class="px-2 py-1 rounded text-[9px]">✅</button>
-                                            <button type="button" @click="field.allowed = false" :class="!field.allowed ? 'bg-rose-600 text-white font-bold' : 'text-slate-500'" class="px-2 py-1 rounded text-[9px]">❌</button>
+                        <div class="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+                            
+                            <template x-if="activePolicy.includes('skchg')">
+                                <div class="space-y-6">
+                                    <div class="border-b border-slate-800 pb-2"><h4 class="text-sky-400 font-bold uppercase tracking-wider text-xs">📝 Column A: Schedule Change Framework fields</h4></div>
+                                    <template x-for="(field, index) in formAirline[activePolicy === 'pure_skchg' ? 'pureSkchg' : 'oalSkchg'].skchgFields" :key="'edit-skchg-'+index">
+                                        <div class="bg-[#0b1329] border border-slate-800 p-2 rounded-lg flex flex-col md:flex-row items-start md:items-center gap-3 text-xs">
+                                            <div class="w-full md:w-1/3"><input type="text" x-model="field.label" class="w-full bg-slate-950 border border-slate-800 p-1.5 rounded font-bold text-sky-400" /></div>
+                                            <div class="flex-1 w-full"><textarea x-model="field.value" class="w-full bg-slate-950 border border-slate-800 p-1.5 rounded text-slate-200" rows="1"></textarea></div>
+                                            <div class="flex items-center space-x-2">
+                                                <div class="flex bg-slate-950 border border-slate-800 p-0.5 rounded">
+                                                    <button type="button" @click="field.allowed = true" :class="field.allowed ? 'bg-emerald-600 text-white font-bold' : 'text-slate-500'" class="px-2 py-1 rounded text-[9px]">✅</button>
+                                                    <button type="button" @click="field.allowed = false" :class="!field.allowed ? 'bg-rose-600 text-white font-bold' : 'text-slate-500'" class="px-2 py-1 rounded text-[9px]">❌</button>
+                                                </div>
+                                                <button type="button" @click="removeCustomField(activePolicy, 'skchgFields', index)" class="text-rose-500 bg-rose-500/10 p-2 rounded border border-rose-500/20 font-bold">🗑️</button>
+                                            </div>
                                         </div>
-                                        <button type="button" @click="removeCustomField(activePolicy, index)" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-2 rounded border border-rose-500/20 font-bold transition">🗑️ Delete</button>
-                                    </div>
+                                    </template>
+
+                                    <div class="border-b border-slate-800 pb-2 pt-2"><h4 class="text-emerald-400 font-bold uppercase tracking-wider text-xs">📝 Column B: Refund Protocols fields</h4></div>
+                                    <template x-for="(field, index) in formAirline[activePolicy === 'pure_skchg' ? 'pureSkchg' : 'oalSkchg'].refundFields" :key="'edit-refund-'+index">
+                                        <div class="bg-[#0b1329] border border-slate-800 p-2 rounded-lg flex flex-col md:flex-row items-start md:items-center gap-3 text-xs">
+                                            <div class="w-full md:w-1/3"><input type="text" x-model="field.label" class="w-full bg-slate-950 border border-slate-800 p-1.5 rounded font-bold text-emerald-400" /></div>
+                                            <div class="flex-1 w-full"><textarea x-model="field.value" class="w-full bg-slate-950 border border-slate-800 p-1.5 rounded text-slate-200" rows="1"></textarea></div>
+                                            <div class="flex items-center space-x-2">
+                                                <div class="flex bg-slate-950 border border-slate-800 p-0.5 rounded">
+                                                    <button type="button" @click="field.allowed = true" :class="field.allowed ? 'bg-emerald-600 text-white font-bold' : 'text-slate-500'" class="px-2 py-1 rounded text-[9px]">✅</button>
+                                                    <button type="button" @click="field.allowed = false" :class="!field.allowed ? 'bg-rose-600 text-white font-bold' : 'text-slate-500'" class="px-2 py-1 rounded text-[9px]">❌</button>
+                                                </div>
+                                                <button type="button" @click="removeCustomField(activePolicy, 'refundFields', index)" class="text-rose-500 bg-rose-500/10 p-2 rounded border border-rose-500/20 font-bold">🗑️</button>
+                                            </div>
+                                        </div>
+                                    </template>
                                 </div>
                             </template>
+
+                            <template x-if="!activePolicy.includes('skchg')">
+                                <div class="space-y-2">
+                                    <template x-for="(field, index) in formAirline[activePolicy === 'pure_name' ? 'pureName' : 'oalName'].fields" :key="'edit-name-'+index">
+                                        <div class="bg-[#0b1329] border border-slate-800 p-2 rounded-lg flex flex-col md:flex-row items-start md:items-center gap-3 text-xs">
+                                            <div class="w-full md:w-1/3"><input type="text" x-model="field.label" class="w-full bg-slate-950 border border-slate-800 p-1.5 rounded font-bold text-purple-400" /></div>
+                                            <div class="flex-1 w-full"><textarea x-model="field.value" class="w-full bg-slate-950 border border-slate-800 p-1.5 rounded text-slate-200" rows="1"></textarea></div>
+                                            <div class="w-full md:w-auto flex items-center space-x-3 pt-3 md:pt-0">
+                                                <div class="flex bg-slate-950 border border-slate-800 p-0.5 rounded">
+                                                    <button type="button" @click="field.allowed = true" :class="field.allowed ? 'bg-emerald-600 text-white font-bold' : 'text-slate-500'" class="px-2 py-1 rounded text-[9px]">✅</button>
+                                                    <button type="button" @click="field.allowed = false" :class="!field.allowed ? 'bg-rose-600 text-white font-bold' : 'text-slate-500'" class="px-2 py-1 rounded text-[9px]">❌</button>
+                                                </div>
+                                                <button type="button" @click="removeCustomField(activePolicy, 'fields', index)" class="text-rose-500 bg-rose-500/10 p-2 rounded border border-rose-500/20 font-bold transition">🗑️</button>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+
                         </div>
                     </div>
 
@@ -522,7 +567,7 @@
                                 </div>
                             </div>
 
-                            <template x-if="activePolicy === 'pure_skchg' || activePolicy === 'oal_skchg'">
+                            <template x-if="activePolicy.includes('skchg')">
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fadeIn">
                                     <div class="bg-[#0b1329] p-4 rounded-xl border border-slate-800 text-center shadow-md">
                                         <span class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">SKD CHG TRIGGER</span>
@@ -552,13 +597,31 @@
                                     </div>
 
                                     <div class="space-y-4 text-xs">
-                                        <template x-for="(field, index) in selectedAirline[activePolicy === 'pure_skchg' ? 'pureSkchg' : activePolicy === 'pure_name' ? 'pureName' : activePolicy === 'oal_skchg' ? 'oalSkchg' : 'oalName']?.fields?.filter((_, i) => i % 2 === 0)" :key="'disp-left-'+index">
-                                            <div x-show="viewMode === 'agent' || !isInternalField(field.label)" class="flex flex-col border-b border-slate-800/40 pb-2.5 animate-fadeIn">
-                                                <div class="flex justify-between items-center mb-1">
-                                                    <span class="text-slate-400 font-bold uppercase text-[10px]" x-text="field.label"></span>
-                                                    <span :class="field.allowed ? 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/20' : 'text-rose-500 bg-rose-500/10 border border-rose-500/20'" class="text-[9px] px-1.5 rounded font-mono font-bold" x-text="field.allowed ? 'ALLOWED' : 'PROHIBITED'"></span>
-                                                </div>
-                                                <p class="text-slate-200 font-medium leading-relaxed" x-text="field.value"></p>
+                                        <template x-if="activePolicy.includes('skchg')">
+                                            <div class="space-y-4">
+                                                <template x-for="(field, index) in selectedAirline[activePolicy === 'pure_skchg' ? 'pureSkchg' : 'oalSkchg']?.skchgFields" :key="'live-skchg-'+index">
+                                                    <div x-show="viewMode === 'agent' || !isInternalField(field.label)" class="flex flex-col border-b border-slate-800/40 pb-2.5 animate-fadeIn">
+                                                        <div class="flex justify-between items-center mb-1">
+                                                            <span class="text-slate-400 font-bold uppercase text-[10px]" x-text="field.label"></span>
+                                                            <span :class="field.allowed ? 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/20' : 'text-rose-500 bg-rose-500/10 border border-rose-500/20'" class="text-[9px] px-1.5 rounded font-mono font-bold" x-text="field.allowed ? 'ALLOWED' : 'PROHIBITED'"></span>
+                                                        </div>
+                                                        <p class="text-slate-200 font-medium leading-relaxed" x-text="field.value"></p>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+
+                                        <template x-if="!activePolicy.includes('skchg')">
+                                            <div class="space-y-4">
+                                                <template x-for="(field, index) in selectedAirline[activePolicy === 'pure_name' ? 'pureName' : 'oalName']?.fields" :key="'live-name-l-'+index">
+                                                    <div x-show="viewMode === 'agent' || !isInternalField(field.label)" class="flex flex-col border-b border-slate-800/40 pb-2.5 animate-fadeIn">
+                                                        <div class="flex justify-between items-center mb-1">
+                                                            <span class="text-slate-400 font-bold uppercase text-[10px]" x-text="field.label"></span>
+                                                            <span :class="field.allowed ? 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/20' : 'text-rose-500 bg-rose-500/10 border border-rose-500/20'" class="text-[9px] px-1.5 rounded font-mono font-bold" x-text="field.allowed ? 'ALLOWED' : 'PROHIBITED'"></span>
+                                                        </div>
+                                                        <p class="text-slate-200 font-medium leading-relaxed" x-text="field.value"></p>
+                                                    </div>
+                                                </template>
                                             </div>
                                         </template>
                                     </div>
@@ -571,13 +634,23 @@
                                     </div>
 
                                     <div class="space-y-4 text-xs">
-                                        <template x-for="(field, index) in selectedAirline[activePolicy === 'pure_skchg' ? 'pureSkchg' : activePolicy === 'pure_name' ? 'pureName' : activePolicy === 'oal_skchg' ? 'oalSkchg' : 'oalName']?.fields?.filter((_, i) => i % 2 !== 0)" :key="'disp-right-'+index">
-                                            <div x-show="viewMode === 'agent' || !isInternalField(field.label)" class="flex flex-col border-b border-slate-800/40 pb-2.5 animate-fadeIn">
-                                                <div class="flex justify-between items-center mb-1">
-                                                    <span class="text-slate-400 font-bold uppercase text-[10px]" x-text="field.label"></span>
-                                                    <span :class="field.allowed ? 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/20' : 'text-rose-500 bg-rose-500/10 border border-rose-500/20'" class="text-[9px] px-1.5 rounded font-mono font-bold" x-text="field.allowed ? 'ALLOWED' : 'PROHIBITED'"></span>
-                                                </div>
-                                                <p class="text-slate-200 font-medium leading-relaxed" x-text="field.value"></p>
+                                        <template x-if="activePolicy.includes('skchg')">
+                                            <div class="space-y-4">
+                                                <template x-for="(field, index) in selectedAirline[activePolicy === 'pure_skchg' ? 'pureSkchg' : 'oalSkchg']?.refundFields" :key="'live-refund-'+index">
+                                                    <div x-show="viewMode === 'agent' || !isInternalField(field.label)" class="flex flex-col border-b border-slate-800/40 pb-2.5 animate-fadeIn">
+                                                        <div class="flex justify-between items-center mb-1">
+                                                            <span class="text-emerald-400 font-bold uppercase text-[10px]" x-text="field.label"></span>
+                                                            <span :class="field.allowed ? 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/20' : 'text-rose-500 bg-rose-500/10 border border-rose-500/20'" class="text-[9px] px-1.5 rounded font-mono font-bold" x-text="field.allowed ? 'ALLOWED' : 'PROHIBITED'"></span>
+                                                        </div>
+                                                        <p class="text-slate-200 font-medium leading-relaxed" x-text="field.value"></p>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+
+                                        <template x-if="!activePolicy.includes('skchg')">
+                                            <div class="space-y-4">
+                                                <p class="text-slate-500 italic text-center py-4">Workstation rules and reissuing formatting sequences are fully synced under the Primary Targets board directory.</p>
                                             </div>
                                         </template>
                                     </div>
