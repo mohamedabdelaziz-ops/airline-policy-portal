@@ -98,10 +98,10 @@
         },
 
         forceResetDatabase() {
-            if(confirm('Wipe local storage cache and reload defaults?')) {
+            if(confirm('Wipe local browser cache data and reload default airlines baseline structural settings?')) {
                 localStorage.removeItem('disruption_desk_fleet_data');
                 this.loadDefaults();
-                alert('Database refreshed successfully!');
+                alert('Database completely reset!');
             }
         },
 
@@ -167,17 +167,11 @@
                             { label: 'MAJOR CHANGE PROFILE', value: '181 minutes or more (3+ Hours) time variation change.', allowed: true },
                             { label: 'BOOKING CLASS (RBD) RULES', value: 'Lowest Class Allowed Fallback inside cabin.', allowed: true },
                             { label: 'ENDORSEMENT BOX WAIVER TEXT', value: 'SKCHG', allowed: true },
-                            { label: 'INVOLUNTARY CANCEL REFUND', value: 'Full Refund Authorized', allowed: true }
+                            { label: 'INVOLUNTARY CANCEL REFUND', value: 'Full Refund Authorized', allowed: true },
+                            { label: 'INVOLUNTARY ADMIN PENALTIES', value: 'None for involuntary', allowed: true }
                         ],
                         iropRefund: []
                     },
-                    pureName: { fields: [] }, oalSkchg: { normalSkchg: [], iropSkchg: [], normalRefund: [], iropRefund: [] }, oalName: { fields: [] }
-                },
-                {
-                    airlineName: 'Lufthansa Group', iata: 'LH', icao: 'DLH', logo: '🇩🇪', lastUpdated: '2026-06-29',
-                    policyWebLink: 'https://www.lufthansagroup.com/en/themes/agency-support.html', policyPdfLink: '',
-                    threshold: 'Varies', travelWindow: 'Subject to inventory rules', oalRebookingVal: 'PROHIBITED', refundEligVal: 'YES',
-                    pureSkchg: { normalSkchg: [], iropSkchg: [], normalRefund: [], iropRefund: [] },
                     pureName: { fields: [] }, oalSkchg: { normalSkchg: [], iropSkchg: [], normalRefund: [], iropRefund: [] }, oalName: { fields: [] }
                 }
             ];
@@ -195,9 +189,17 @@
                         this.selectedAirline = this.airlines[0];
                         return;
                     }
-                } catch(e) { console.error('Corrupted cache detected.'); }
+                } catch(e) { console.error('Corrupted cache data.'); }
             }
             this.loadDefaults();
+        },
+
+        get filteredAirlines() {
+            if (!this.searchQuery) return this.airlines;
+            return this.airlines.filter(airline => {
+                return airline.airlineName.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+                       airline.iata.toLowerCase().includes(this.searchQuery.toLowerCase());
+            });
         },
 
         addCustomField(pillar) {
@@ -216,8 +218,8 @@
                     label: this.newCustomLabel.toUpperCase(), value: this.newCustomValue, allowed: this.newCustomStatus
                 });
             } else {
-                if(!this.formAirline[targetPillarKey].fields) this.formAirline[targetPillarKey].fields = [];
-                this.formAirline[targetPillarKey].fields.push({
+                if(!this.formAirline[targetPillarKey]['fields']) this.formAirline[targetPillarKey]['fields'] = [];
+                this.formAirline[targetPillarKey]['fields'].push({
                     label: this.newCustomLabel.toUpperCase(), value: this.newCustomValue, allowed: this.newCustomStatus
                 });
             }
@@ -229,7 +231,7 @@
             if(pillar.includes('skchg')) {
                 this.formAirline[targetPillarKey][subType].splice(idx, 1);
             } else {
-                this.formAirline[targetPillarKey].fields.splice(idx, 1);
+                this.formAirline[targetPillarKey]['fields'].splice(idx, 1);
             }
         },
 
@@ -255,7 +257,7 @@
                 if(this.formAirline.pureSkchg.normalRefund) freshBase.pureSkchg.normalRefund = JSON.parse(JSON.stringify(this.formAirline.pureSkchg.normalRefund));
                 if(this.formAirline.pureSkchg.iropRefund) freshBase.pureSkchg.iropRefund = JSON.parse(JSON.stringify(this.formAirline.pureSkchg.iropRefund));
             }
-            if(this.formAirline.pureName && this.formAirline.pureName.fields) freshBase.pureName.fields = JSON.parse(JSON.stringify(this.formAirline.pureName.fields));
+            if(this.formAirline.pureName && this.formAirline.pureName['fields']) freshBase.pureName['fields'] = JSON.parse(JSON.stringify(this.formAirline.pureName['fields']));
             
             if(this.formAirline.oalSkchg) {
                 if(this.formAirline.oalSkchg.normalSkchg) freshBase.oalSkchg.normalSkchg = JSON.parse(JSON.stringify(this.formAirline.oalSkchg.normalSkchg));
@@ -263,7 +265,7 @@
                 if(this.formAirline.oalSkchg.normalRefund) freshBase.oalSkchg.normalRefund = JSON.parse(JSON.stringify(this.formAirline.oalSkchg.normalRefund));
                 if(this.formAirline.oalSkchg.iropRefund) freshBase.oalSkchg.iropRefund = JSON.parse(JSON.stringify(this.formAirline.oalSkchg.iropRefund));
             }
-            if(this.formAirline.oalName && this.formAirline.oalName.fields) freshBase.oalName.fields = JSON.parse(JSON.stringify(this.formAirline.oalName.fields));
+            if(this.formAirline.oalName && this.formAirline.oalName['fields']) freshBase.oalName['fields'] = JSON.parse(JSON.stringify(this.formAirline.oalName['fields']));
 
             const idx = this.airlines.findIndex(a => a.iata === freshBase.iata);
             if(idx !== -1) {
@@ -348,11 +350,11 @@
 
                 <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl">
                     <div class="flex justify-between items-center mb-3">
-                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Airlines Index (<span x-text="filteredAirlines.length"></span>)</span>
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Airlines Index (<span x-text="airlines.length"></span>)</span>
                         <button x-show="isAdminMode" @click="prepareNewAirlineForm()" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold px-2 py-0.5 rounded text-[10px] uppercase tracking-wider transition">New +</button>
                     </div>
                     <div class="space-y-1.5 max-h-[250px] overflow-y-auto pr-1">
-                        <template x-for="airline in filteredAirlines" :key="airline.iata">
+                        <template x-for="airline in airlines.filter(a => !searchQuery || a.airlineName.toLowerCase().includes(searchQuery.toLowerCase()) || a.iata.toLowerCase().includes(searchQuery.toLowerCase()))" :key="airline.iata">
                             <div class="flex items-center space-x-1">
                                 <button @click="selectedAirline = airline" :class="selectedAirline && selectedAirline.iata === airline.iata ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-lg' : 'bg-slate-950 border border-slate-800/60'" class="flex-1 text-left p-3 rounded-lg flex justify-between items-center transition">
                                     <div class="flex items-center space-x-3"><span x-text="airline.logo"></span><span class="font-semibold" x-text="airline.airlineName"></span></div>
@@ -475,6 +477,9 @@
                                             <span>📥</span> <span>Download Reference Guidelines (PDF)</span>
                                         </a>
                                     </template>
+                                    <template x-if="!selectedAirline.policyWebLink && !selectedAirline.policyPdfLink">
+                                        <p class="text-slate-500 italic py-1">No verified external attachments uploaded for this carrier.</p>
+                                    </template>
                                 </div>
                             </div>
 
@@ -517,7 +522,7 @@
                                                             <span class="text-slate-400 font-bold uppercase text-[10px]" x-text="field.label"></span>
                                                             <span :class="field.allowed ? 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/20' : 'text-rose-500 bg-rose-500/10 border border-rose-500/20'" class="text-[9px] px-1.5 rounded font-mono font-bold" x-text="field.allowed ? 'ALLOWED' : 'PROHIBITED'"></span>
                                                         </div>
-                                                        <p class="text-slate-200 font-medium leading-relaxed" x-text="field.value"></p>
+                                                        <p class="text-slate-200 font-medium leading-relaxed select-text" x-text="field.value"></p>
                                                     </div>
                                                 </template>
                                                 
@@ -528,13 +533,13 @@
                                                             <span class="text-slate-400 font-bold uppercase text-[10px]" x-text="field.label"></span>
                                                             <span :class="field.allowed ? 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/20' : 'text-rose-500 bg-rose-500/10 border border-rose-500/20'" class="text-[9px] px-1.5 rounded font-mono font-bold" x-text="field.allowed ? 'ALLOWED' : 'PROHIBITED'"></span>
                                                         </div>
-                                                        <p class="text-slate-200 font-medium leading-relaxed" x-text="field.value"></p>
+                                                        <p class="text-slate-200 font-medium leading-relaxed select-text" x-text="field.value"></p>
                                                     </div>
                                                 </template>
                                             </div>
                                         </template>
 
-                                        <template x-if="!activePolicy.includes('skchg')">
+                                        <template x-show="!activePolicy.includes('skchg')" x-if="!activePolicy.includes('skchg')">
                                             <div class="space-y-4">
                                                 <template x-for="(field, index) in selectedAirline[activePolicy === 'pure_name' ? 'pureName' : 'oalName']?.fields" :key="'live-name-l-'+index">
                                                     <div x-show="viewMode === 'agent' || !isInternalField(field.label)" class="flex flex-col border-b border-slate-800/40 pb-2.5 animate-fadeIn">
@@ -542,7 +547,7 @@
                                                             <span class="text-slate-400 font-bold uppercase text-[10px]" x-text="field.label"></span>
                                                             <span :class="field.allowed ? 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/20' : 'text-rose-500 bg-rose-500/10 border border-rose-500/20'" class="text-[9px] px-1.5 rounded font-mono font-bold" x-text="field.allowed ? 'ALLOWED' : 'PROHIBITED'"></span>
                                                         </div>
-                                                        <p class="text-slate-200 font-medium leading-relaxed" x-text="field.value"></p>
+                                                        <p class="text-slate-200 font-medium leading-relaxed select-text" x-text="field.value"></p>
                                                     </div>
                                                 </template>
                                             </div>
@@ -566,7 +571,7 @@
                                                             <span class="text-emerald-400 font-bold uppercase text-[10px]" x-text="field.label"></span>
                                                             <span :class="field.allowed ? 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/20' : 'text-rose-500 bg-rose-500/10 border border-rose-500/20'" class="text-[9px] px-1.5 rounded font-mono font-bold" x-text="field.allowed ? 'ALLOWED' : 'PROHIBITED'"></span>
                                                         </div>
-                                                        <p class="text-slate-200 font-medium leading-relaxed" x-text="field.value"></p>
+                                                        <p class="text-slate-200 font-medium leading-relaxed select-text" x-text="field.value"></p>
                                                     </div>
                                                 </template>
                                                 
@@ -577,7 +582,7 @@
                                                             <span class="text-emerald-400 font-bold uppercase text-[10px]" x-text="field.label"></span>
                                                             <span :class="field.allowed ? 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/20' : 'text-rose-500 bg-rose-500/10 border border-rose-500/20'" class="text-[9px] px-1.5 rounded font-mono font-bold" x-text="field.allowed ? 'ALLOWED' : 'PROHIBITED'"></span>
                                                         </div>
-                                                        <p class="text-slate-200 font-medium leading-relaxed" x-text="field.value"></p>
+                                                        <p class="text-slate-200 font-medium leading-relaxed select-text" x-text="field.value"></p>
                                                     </div>
                                                 </template>
                                             </div>
