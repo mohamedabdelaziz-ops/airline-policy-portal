@@ -52,25 +52,13 @@
             en: {
                 title: 'DISRUPTION DESK',
                 subtitle: 'Airline Policy Reference Hub',
-                searchLabel: 'Search Fleet Index',
                 searchPlaceholder: 'Carrier, IATA, ICAO...',
-                indexLabel: 'Airlines Index',
-                paxView: 'PASSENGER VIEW',
-                agentView: 'AGENT VIEW',
-                tabPureSkchg: '🔄 Pure Airline: Schedule Change',
-                tabPureName: '📝 Pure Airline: Name Correction',
-                tabOalSkchg: '✈️ OAL Policy: Schedule Change',
-                tabOalName: '⌨️ OAL Policy: Name Correction',
-                docSectionHeader: 'OFFICIAL CARRIER DOCUMENT VAULT',
-                webLinkLabel: 'Official Web Policy Portal',
-                pdfLinkLabel: 'Download Reference Guidelines (PDF)',
-                noLinksText: 'No verified external attachments uploaded for this carrier.',
-                noSelection: 'No Carrier Selection Detected'
+                noSelection: 'No Airline Selected'
             }
         },
 
         formAirline: {
-            airlineName: '', iata: '', icao: '', logo: '✈️', lastUpdated: '2026-06-29',
+            airlineName: '', iata: '', icao: '', logo: '✈️', lastUpdated: '2026-06-30',
             policyWebLink: '', policyPdfLink: '',
             threshold: '', travelWindow: '', oalRebookingVal: 'ALLOWED', refundEligVal: 'YES',
             pureSkchg: { normalSkchg: [], iropSkchg: [], normalRefund: [], iropRefund: [] },
@@ -87,7 +75,7 @@
 
         generateEmptyStructure() {
             return {
-                airlineName: '', iata: '', icao: '', logo: '✈️', lastUpdated: '2026-06-29',
+                airlineName: '', iata: '', icao: '', logo: '✈️', lastUpdated: '2026-06-30',
                 policyWebLink: '', policyPdfLink: '',
                 threshold: 'N/A', travelWindow: 'N/A', oalRebookingVal: 'ALLOWED', refundEligVal: 'YES',
                 pureSkchg: { normalSkchg: [], iropSkchg: [], normalRefund: [], iropRefund: [] },
@@ -98,7 +86,7 @@
         },
 
         forceResetDatabase() {
-            if(confirm('Wipe local browser cache and reload system core default airlines?')) {
+            if(confirm('Wipe local browser cache data and reload default configurations?')) {
                 localStorage.removeItem('disruption_desk_fleet_data');
                 this.loadDefaults();
                 alert('Database completely reset!');
@@ -108,7 +96,7 @@
         loadDefaults() {
             this.airlines = [
                 {
-                    airlineName: 'Delta Air Lines', iata: 'DL', icao: 'DAL', logo: '📐', lastUpdated: '2026-06-29',
+                    airlineName: 'Delta Air Lines', iata: 'DL', icao: 'DAL', logo: '📐', lastUpdated: '2026-06-30',
                     policyWebLink: 'https://pro.delta.com', policyPdfLink: '',
                     threshold: '180', travelWindow: '-/+2 days', oalRebookingVal: 'ALLOWED', refundEligVal: 'YES',
                     pureSkchg: {
@@ -123,61 +111,20 @@
                     pureName: { fields: [] }, oalSkchg: { normalSkchg: [], iropSkchg: [], normalRefund: [], iropRefund: [] }, oalName: { fields: [] }
                 },
                 {
-                    airlineName: 'Air Canada', iata: 'AC', icao: 'ACA', logo: '🇨🇦', lastUpdated: '2026-06-29',
+                    airlineName: 'Air Canada', iata: 'AC', icao: 'ACA', logo: '🇨🇦', lastUpdated: '2026-06-30',
                     policyWebLink: 'https://www.aircanada.com/agency', policyPdfLink: '',
                     threshold: '180', travelWindow: '-/+30 days', oalRebookingVal: 'ALLOWED', refundEligVal: 'YES',
                     pureSkchg: {
                         normalSkchg: [
                             { label: 'MINOR CHANGE PROFILE', value: 'Less than 60 minutes time deviation.', allowed: true },
                             { label: 'CABIN MATCHING RULES', value: 'Strict Cabin Balance Required.', allowed: false },
-                            { label: 'INVENTORY FALLBACK TARGET', value: 'Original booking class preferred; up to Y class maximum fallback.', allowed: true },
-                            { label: 'GEO AIRPORT ALLOWANCE MAP', value: 'Sister cities or alternate nodes within 200 miles radius permitted.', allowed: true }
+                            { label: 'INVENTORY FALLBACK TARGET', value: 'Original booking class preferred; up to Y class maximum fallback.', allowed: true }
                         ],
                         iropSkchg: [
-                            { label: 'MAJOR CHANGE PROFILE', value: '60 minutes or more / Operating carrier change / Stop added.', allowed: true },
-                            { label: 'POLICY IF MAIN AIRLINE CAUSES CHANGE', value: 'Full complimentary rebooking on AC mainline flights inside identical cabins matching original routing loops.', allowed: true }
+                            { label: 'MAJOR CHANGE PROFILE', value: '60 minutes or more / Operating carrier change / Stop added.', allowed: true }
                         ],
-                        normalRefund: [
-                            { label: 'BOOKING CLASS (RBD) RULES', value: 'Use original RBD. Fallback to lowest open code up to M class.', allowed: true },
-                            { label: 'INVOLUNTARY ADMIN PENALTIES', value: 'None', allowed: true }
-                        ],
-                        iropRefund: [
-                            { label: 'SIGNIFICANT CHANGE TRIGGER', value: 'More than 3 hours deviation', allowed: true },
-                            { label: 'ENDORSEMENT BOX WAIVER TEXT', value: 'DUE SKCH', allowed: true },
-                            { label: 'INVOLUNTARY CANCEL REFUND', value: 'Full Refund Authorized', allowed: true }
-                        ]
+                        normalRefund: [], iropRefund: []
                     },
-                    pureName: { fields: [] }, oalSkchg: { normalSkchg: [], iropSkchg: [], normalRefund: [], iropRefund: [] }, oalName: { fields: [] }
-                },
-                {
-                    airlineName: 'WestJet Airlines', iata: 'WS', icao: 'WJA', logo: '🍁', lastUpdated: '2026-06-26',
-                    policyWebLink: 'https://www.westjet.com/en-ca/travel-agents', policyPdfLink: '',
-                    threshold: '181 minutes', travelWindow: '+/-2 days original dates', oalRebookingVal: 'ALLOWED', refundEligVal: 'YES',
-                    pureSkchg: {
-                        normalSkchg: [
-                            { label: 'MINOR CHANGE PROFILE', value: 'Less than 181 minutes time gap layout change.', allowed: true },
-                            { label: 'CABIN MATCHING RULES', value: 'Same Cabin Balance Required.', allowed: false },
-                            { label: 'INVENTORY FALLBACK TARGET', value: 'Next highest up to Y (Eco) / W (Prem) / J (Biz).', allowed: true },
-                            { label: 'GEO AIRPORT ALLOWANCE MAP', value: 'Within 320 km / 200 miles (e.g. YVR/YXX)', allowed: true }
-                        ],
-                        iropSkchg: [
-                            { label: 'SIGNIFICANT CHANGE TRIGGER', value: '181 minutes or structural cancellation.', allowed: true }
-                        ],
-                        normalRefund: [
-                            { label: 'MAJOR CHANGE PROFILE', value: '181 minutes or more (3+ Hours) time variation change.', allowed: true },
-                            { label: 'BOOKING CLASS (RBD) RULES', value: 'Lowest Class Allowed Fallback inside cabin.', allowed: true },
-                            { label: 'ENDORSEMENT BOX WAIVER TEXT', value: 'SKCHG', allowed: true },
-                            { label: 'INVOLUNTARY CANCEL REFUND', value: 'Full Refund Authorized', allowed: true }
-                        ],
-                        iropRefund: []
-                    },
-                    pureName: { fields: [] }, oalSkchg: { normalSkchg: [], iropSkchg: [], normalRefund: [], iropRefund: [] }, oalName: { fields: [] }
-                },
-                {
-                    airlineName: 'Lufthansa Group', iata: 'LH', icao: 'DLH', logo: '🇩🇪', lastUpdated: '2026-06-29',
-                    policyWebLink: 'https://www.lufthansagroup.com/en/themes/agency-support.html', policyPdfLink: '',
-                    threshold: 'Varies', travelWindow: 'Subject to inventory rules', oalRebookingVal: 'PROHIBITED', refundEligVal: 'YES',
-                    pureSkchg: { normalSkchg: [], iropSkchg: [], normalRefund: [], iropRefund: [] },
                     pureName: { fields: [] }, oalSkchg: { normalSkchg: [], iropSkchg: [], normalRefund: [], iropRefund: [] }, oalName: { fields: [] }
                 }
             ];
@@ -190,7 +137,7 @@
             if (localSavedData) {
                 try {
                     const parsed = JSON.parse(localSavedData);
-                    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].pureSkchg && parsed[0].pureSkchg.normalSkchg) {
+                    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].pureSkchg) {
                         this.airlines = parsed;
                         this.selectedAirline = this.airlines[0];
                         return;
@@ -233,13 +180,14 @@
             }
         },
 
+        // 🛠️ FIX: EXPLICIT DEEP MAP TEMPLATES ARE ASSIGNED IMMEDIATELY TO GUARANTEE INJECTS DON'T CRASH
         saveAirline() {
             if(!this.formAirline.airlineName) return alert('Airline Name is required to save.');
             
             let freshBase = this.generateEmptyStructure();
             
             freshBase.airlineName = this.formAirline.airlineName;
-            freshBase.iata = this.formAirline.iata ? this.formAirline.iata.toUpperCase() : this.formAirline.airlineName.substring(0,2).toUpperCase() + Math.floor(Math.random() * 10);
+            freshBase.iata = this.formAirline.iata ? this.formAirline.iata.toUpperCase() : this.formAirline.airlineName.substring(0,2).toUpperCase() + Math.floor(Math.random() * 100);
             freshBase.icao = this.formAirline.icao ? this.formAirline.icao.toUpperCase() : '';
             freshBase.logo = this.formAirline.logo || '✈️';
             freshBase.policyWebLink = this.formAirline.policyWebLink || '';
@@ -273,7 +221,7 @@
             }
             
             localStorage.setItem('disruption_desk_fleet_data', JSON.stringify(this.airlines));
-            this.selectedAirline = this.airlines.find(a => a.iata === freshBase.iata);
+            this.selectedAirline = freshBase;
             this.isEditing = false; this.isAdminMode = false; this.resetForm();
         },
 
@@ -289,6 +237,7 @@
         prepareNewAirlineForm() {
             this.formAirline = this.generateEmptyStructure();
             this.isEditing = false;
+            this.isAdminMode = true;
         },
 
         verifyAdmin() {
@@ -312,16 +261,16 @@
             
             <div class="flex items-center space-x-4">
                 <div class="flex items-center bg-slate-900 border border-slate-800 p-0.5 rounded-lg">
-                    <button @click="viewMode = 'customer'" :class="viewMode === 'customer' ? 'bg-sky-600 text-white font-bold' : 'text-slate-400 hover:text-white'" class="px-3 py-1 rounded text-[10px] uppercase transition">PASSENGER VIEW</button>
-                    <button @click="viewMode = 'agent'" :class="viewMode === 'agent' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-white'" class="px-3 py-1 rounded text-[10px] uppercase transition">AGENT VIEW</button>
+                    <button @click="viewMode = 'customer'" :class="viewMode === 'customer' ? 'bg-sky-600 text-white font-bold' : 'text-slate-400'" class="px-3 py-1 rounded text-[10px] uppercase transition">PASSENGER VIEW</button>
+                    <button @click="viewMode = 'agent'" :class="viewMode === 'agent' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400'" class="px-3 py-1 rounded text-[10px] uppercase transition">AGENT VIEW</button>
                 </div>
 
                 <div class="flex items-center bg-slate-900 p-1 border border-slate-800 rounded-lg">
-                    <input type="password" placeholder="Admin Key..." x-model="adminPasswordInput" @keyup.enter="verifyAdmin()" class="bg-slate-950 border-0 outline-none text-xs px-2 py-1 rounded text-white w-20 focus:ring-1 focus:ring-sky-500" />
+                    <input type="password" placeholder="Admin Key..." x-model="adminPasswordInput" @keyup.enter="verifyAdmin()" class="bg-slate-950 border-0 outline-none text-xs px-2 py-1 rounded text-white w-20" />
                     <button @click="verifyAdmin()" class="bg-slate-800 hover:bg-sky-600 text-white font-bold text-[10px] px-2 py-1 rounded ml-1 transition">Auth</button>
                 </div>
                 <template x-if="isAdminMode">
-                    <button @click="isAdminMode = false; resetForm()" class="text-[10px] font-bold border border-slate-700 bg-slate-800 hover:bg-rose-600 text-white px-2.5 py-1 rounded transition uppercase">Lock</button>
+                    <button @click="isAdminMode = false; resetForm()" class="text-[10px] font-bold bg-slate-800 hover:bg-rose-600 text-white px-2.5 py-1 rounded transition uppercase">Lock</button>
                 </template>
             </div>
         </nav>
@@ -332,7 +281,7 @@
                 <div class="bg-gradient-to-br from-slate-900 to-indigo-950/40 border border-slate-800 p-5 rounded-xl shadow-xl space-y-3">
                     <div class="flex items-center space-x-2 border-b border-slate-800 pb-2"><span class="text-base">🕰️</span><h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Zulu Time Converter</h4></div>
                     <div class="space-y-2">
-                        <input type="text" x-model="zuluInput" placeholder="e.g. 17:30" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white font-mono text-sm focus:outline-none focus:ring-1 focus:ring-sky-500" />
+                        <input type="text" x-model="zuluInput" placeholder="e.g. 17:30" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white font-mono text-sm focus:outline-none" />
                         <div class="bg-slate-950/80 border border-slate-800 p-2.5 rounded-lg flex justify-between items-center">
                             <span class="text-[10px] uppercase text-slate-400 font-semibold">EST Equivalent:</span><span class="text-xs font-bold font-mono text-sky-400" x-text="estOutput"></span>
                         </div>
@@ -342,7 +291,7 @@
                 <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl shadow-xl space-y-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Search Fleet Index</label>
-                        <input type="text" placeholder="Carrier, IATA, ICAO..." x-model="searchQuery" class="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                        <input type="text" placeholder="Carrier, IATA, ICAO..." x-model="searchQuery" class="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none" />
                     </div>
                 </div>
 
@@ -368,7 +317,7 @@
             <div class="lg:col-span-3 space-y-6">
                 
                 <div class="bg-slate-900 border border-slate-800 p-1.5 rounded-xl grid grid-cols-2 md:grid-cols-4 gap-1.5">
-                    <button @click="activePolicy = 'pure_skchg'" :class="activePolicy === 'pure_skchg' ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow font-bold' : 'text-slate-400'" class="py-2 rounded-lg font-semibold font-bold" x-text="i18n[currentLang].tabPureSkchg"></button>
+                    <button @click="activePolicy = 'pure_skchg'" :class="activePolicy === 'pure_skchg' ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow font-bold' : 'text-slate-400'" class="py-2 rounded-lg font-semibold" x-text="i18n[currentLang].tabPureSkchg"></button>
                     <button @click="activePolicy = 'pure_name'" :class="activePolicy === 'pure_name' ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow font-bold' : 'text-slate-400'" class="py-2 rounded-lg font-semibold" x-text="i18n[currentLang].tabPureName"></button>
                     <button @click="activePolicy = 'oal_skchg'" :class="activePolicy === 'oal_skchg' ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow font-bold' : 'text-slate-400'" class="py-2 rounded-lg font-semibold" x-text="i18n[currentLang].tabOalSkchg"></button>
                     <button @click="activePolicy = 'oal_name'" :class="activePolicy === 'oal_name' ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow font-bold' : 'text-slate-400'" class="py-2 rounded-lg font-semibold" x-text="i18n[currentLang].tabOalName"></button>
@@ -376,8 +325,8 @@
 
                 <div x-show="isAdminMode" class="bg-[#0b1329] border border-slate-800 rounded-xl p-6 shadow-2xl space-y-6">
                     <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                        <span class="text-xs font-bold text-amber-400 uppercase tracking-widest block">ADMIN PROFILE MANAGEMENT CONTROL PANEL</span>
-                        <button type="button" @click="forceResetDatabase()" class="bg-rose-900/60 hover:bg-rose-600 border border-rose-800 text-white font-bold px-2.5 py-0.5 rounded text-[10px] uppercase transition">⚠️ Clear Cache & Reset DB</button>
+                        <span class="text-xs font-bold text-amber-400 uppercase tracking-widest block">ADMIN CONTROL PANEL</span>
+                        <button type="button" @click="forceResetDatabase()" class="bg-rose-900/60 hover:bg-rose-600 border border-rose-800 text-white font-bold px-2.5 py-0.5 rounded text-[10px] uppercase transition">⚠️ Reset DB Caches</button>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
