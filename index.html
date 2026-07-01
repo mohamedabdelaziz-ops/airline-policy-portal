@@ -63,15 +63,6 @@
         targetColumnType: 'skchg', 
         targetConditionType: 'normal', 
 
-        i18n: {
-            en: {
-                title: 'DISRUPTION DESK',
-                subtitle: 'Airline Policy Reference Hub',
-                searchPlaceholder: 'Carrier, IATA, ICAO...',
-                noSelection: 'No Airline Selected'
-            }
-        },
-
         formAirline: {
             airlineName: '', iata: '', icao: '', country: '', alliance: '', logo: '✈️', lastUpdated: '2026-07-01',
             threshold: '', travelWindowBefore: '', travelWindowAfter: '', validTravelPeriod: '',
@@ -167,10 +158,13 @@
             if (localSavedData) {
                 try {
                     const parsed = JSON.parse(localSavedData);
-                    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].pureSkchg) {
+                    // Automatic Schema Migration Guard: Checks if the old database layout is missing the new 'travelWindowBefore' variable
+                    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].pureSkchg && parsed[0].travelWindowBefore !== undefined) {
                         this.airlines = parsed;
                         this.selectedAirline = this.airlines[0];
                         return;
+                    } else {
+                        console.warn('Old database layout detected. Safely flushing cache to prevent screen crash.');
                     }
                 } catch(e) { console.error('Corrupted cache data.'); }
             }
@@ -332,9 +326,9 @@
                 this.missingFieldsList = data.undeterminedFields || [];
                 this.aiMetricsLoaded = true;
                 
-                alert("✨ AI Generation Complete! Review extracted mappings inside the admin frame parameters below.");
+                alert("✨ Complete! Fields parsed and populated below. Please review your matrix before saving.");
             } catch (e) {
-                alert('Connection monitoring node mapping dropped.');
+                alert('Connection tracking to AI parsing routine dropped.');
             }
         }
     }" class="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans antialiased text-xs">
@@ -568,6 +562,7 @@
                                 <div><label class="block text-slate-400 mb-0.5">Divorce Decree Documentation Update</label><input type="text" x-model="formAirline.divorceRules" class="w-full bg-slate-950 border border-slate-800 p-2 rounded text-white" /></div>
                                 <div><label class="block text-slate-400 mb-0.5">Passport Resync Requirements</label><input type="text" x-model="formAirline.passportUpdate" class="w-full bg-slate-950 border border-slate-800 p-2 rounded text-white" /></div>
                             </div>
+                            
                             <div class="bg-[#070b19] p-4 rounded-xl border border-slate-800 space-y-3">
                                 <span class="text-[10px] font-bold text-amber-500 block uppercase tracking-wider">🧳 Baggage Allowances & Allowance Limits</span>
                                 <div><label class="block text-slate-400 mb-0.5">Carry-on Specifications</label><input type="text" x-model="formAirline.carryOnBaggage" class="w-full bg-slate-950 border border-slate-800 p-2 rounded text-white" /></div>
@@ -669,6 +664,11 @@
                                         <template x-if="selectedAirline.policyWebLink">
                                             <a :href="selectedAirline.policyWebLink" target="_blank" class="flex items-center space-x-2 bg-slate-950 hover:bg-sky-950 border border-slate-700/60 hover:border-sky-500 text-slate-300 hover:text-sky-400 px-4 py-3 rounded-lg transition shadow-md">
                                                 <span>🔗</span> <span>Official Web Policy Portal</span>
+                                            </a>
+                                        </template>
+                                        <template x-if="selectedAirline.policyPdfLink">
+                                            <a :href="selectedAirline.policyPdfLink" target="_blank" download class="flex items-center space-x-2 bg-slate-950 hover:bg-emerald-950 border border-slate-700/60 hover:border-emerald-500 text-slate-300 hover:text-emerald-400 px-4 py-3 rounded-lg transition shadow-md">
+                                                <span>📥</span> <span>Download Reference Guidelines (PDF)</span>
                                             </a>
                                         </template>
                                     </div>
